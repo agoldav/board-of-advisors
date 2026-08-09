@@ -587,7 +587,9 @@ vender el producto.
 
 ## 9. Estado de Completado / Pendiente
 
-### ✅ Completado (Sesión 2026-08-08 — /plan-eng-review)
+### ✅ Completado 
+
+**Sesión 2026-08-08 — /plan-eng-review + Repositorio & Business Context**
 
 **Decisiones cerrradas en revisión de ingeniería:**
 | # | Fecha | Decisión | 
@@ -616,26 +618,20 @@ vender el producto.
 - H9: Streaming de primera lectura — resuelto en D-038
 - H10: Reuso de estados financieros — resuelto en D-037
 
-**Artefactos generados:**
+**Artefactos generados (08-08):**
 - Design doc: 10 hallazgos, mapa de tests, modos de falla, 13 tareas
 - docs/06-SYSTEM-ARCHITECTURE.md: 5 subsistemas con diagramas
 - docs/07-DATA-MODEL.md: esquema completo con máquina de estados
 - Plan de pruebas + tareas JSONL: ~/.gstack/projects/BoardofAdvisors/
+- **BUSINESS_CONTEXT.md**: Perfil completo de Siscon (revenue, team, financials, constraints)
+- **GitHub repo**: https://github.com/agoldav/board-of-advisors (inicializado, README+gitignore+LICENSE)
 
 ---
 
 ### ⏳ Pendiente
 
 **Bloqueadores inmediatos:**
-1. **Repositorio de GitHub** — No existe aún. Necesario para GitHub Actions (disparador del seguimiento). Primer paso antes de cualquier código.
-   - [ ] Decidir nombre del repo
-   - [ ] Crear repo (público/privado)
-   - [ ] Configurar README, .gitignore, LICENSE
-
-2. **Página de contexto del negocio** — Primer dato que la app necesita. Es la foto del perfil de la empresa (nombre, sector, tamaño, fortalezas, preocupaciones, competencia).
-   - [ ] Redactar perfil inicial del negocio
-
-3. **Activar recarga automática en Anthropic** — Evitar sorpresas si los $20 iniciales se agotan.
+1. **Activar recarga automática en Anthropic** — Evitar sorpresas si los $20 iniciales se agotan.
    - [ ] Configurar en consola de Anthropic
    - [ ] Considerar API key aparte para esta app
 

@@ -564,7 +564,9 @@ change the architecture if deferred past it. Decide before the product is sold.
 
 ## 9. Status: Completed / Pending
 
-### ✅ Completed (Session 2026-08-08 — /plan-eng-review)
+### ✅ Completed
+
+**Session 2026-08-08 — /plan-eng-review + Repository & Business Context**
 
 **Engineering Review decisions closed:**
 | # | Date | Decision |
@@ -593,11 +595,13 @@ change the architecture if deferred past it. Decide before the product is sold.
 - H9: First-reading streaming — resolved in D-038
 - H10: Financial statement reuse — resolved in D-037
 
-**Artifacts generated:**
+**Artifacts generated (08-08):**
 - Design doc: 10 findings, test map, failure modes, 13 tasks
 - docs/06-SYSTEM-ARCHITECTURE.md: 5 subsystems with diagrams
 - docs/07-DATA-MODEL.md: full schema with state machine
 - Test plan + tasks JSONL: ~/.gstack/projects/BoardofAdvisors/
+- **BUSINESS_CONTEXT.md**: Complete Siscon company profile (revenue, team, financials, constraints)
+- **GitHub repo**: https://github.com/agoldav/board-of-advisors (initialized, README + gitignore + LICENSE)
 
 **Test coverage map:** 19 paths, 4 critical
 
@@ -606,15 +610,7 @@ change the architecture if deferred past it. Decide before the product is sold.
 ### ⏳ Pending
 
 **Immediate blockers:**
-1. **GitHub repository** — Does not exist. Required for GitHub Actions (tracking trigger). First step before any code.
-   - [ ] Decide repo name
-   - [ ] Create repo (public/private)
-   - [ ] Configure README, .gitignore, LICENSE
-
-2. **Business context page** — First data the app needs. Snapshot of company profile (name, sector, size, strengths, worries, competition).
-   - [ ] Draft initial business profile
-
-3. **Enable auto-reload in Anthropic console** — Avoid surprises if initial $20 is exhausted.
+1. **Enable auto-reload in Anthropic console** — Avoid surprises if initial $20 is exhausted.
    - [ ] Configure in Anthropic console
    - [ ] Consider separate API key for this app
 
