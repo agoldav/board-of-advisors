@@ -22,6 +22,12 @@ export interface GenerateParams {
    * (profile_versions.rendered_prefix). Sent as a cached system block.
    */
   cachedPrefix: string;
+  /**
+   * Small per-advisor instruction delta appended AFTER the cached prefix (D-034).
+   * Kept out of the cached block so the shared prefix stays byte-identical across
+   * advisors and keeps hitting cache.
+   */
+  advisorInstructions?: string;
   messages: ChatMessage[];
   maxTokens?: number;
 }
@@ -49,15 +55,26 @@ export interface LlmProvider {
   ): Promise<GenerateResult>;
 }
 
-/** Build the cached system block. cache_control marks the stable prefix. */
-function systemBlocks(cachedPrefix: string) {
-  return [
+/**
+ * Build the system blocks. The first block is the cached, byte-stable prefix
+ * (cache_control marks it). An optional second block carries the small
+ * per-advisor delta and is intentionally NOT cached.
+ */
+function systemBlocks(
+  cachedPrefix: string,
+  advisorInstructions?: string,
+): Anthropic.TextBlockParam[] {
+  const blocks: Anthropic.TextBlockParam[] = [
     {
-      type: "text" as const,
+      type: "text",
       text: cachedPrefix,
-      cache_control: { type: "ephemeral" as const },
+      cache_control: { type: "ephemeral" },
     },
   ];
+  if (advisorInstructions && advisorInstructions.trim()) {
+    blocks.push({ type: "text", text: advisorInstructions });
+  }
+  return blocks;
 }
 
 function toUsage(raw: Anthropic.Usage): Usage {
@@ -100,7 +117,7 @@ export class AnthropicProvider implements LlmProvider {
     const res = await this.client.messages.create({
       model: params.model,
       max_tokens: params.maxTokens ?? 4096,
-      system: systemBlocks(params.cachedPrefix),
+      system: systemBlocks(params.cachedPrefix, params.advisorInstructions),
       messages: params.messages,
     });
     if (res.stop_reason === "refusal") throw new RefusalError();
@@ -122,7 +139,7 @@ export class AnthropicProvider implements LlmProvider {
     const stream = this.client.messages.stream({
       model: params.model,
       max_tokens: params.maxTokens ?? 4096,
-      system: systemBlocks(params.cachedPrefix),
+      system: systemBlocks(params.cachedPrefix, params.advisorInstructions),
       messages: params.messages,
     });
 
