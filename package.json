@@ -1,0 +1,29 @@
+{
+  "name": "board-of-advisors",
+  "version": "0.1.0",
+  "private": true,
+  "description": "AI board of advisors for small business owners — backend core (profile, model router, commitments).",
+  "type": "module",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "vitest run",
+    "test:watch": "vitest"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.65.0",
+    "luxon": "^3.7.2",
+    "pg": "^8.16.3"
+  },
+  "devDependencies": {
+    "@types/luxon": "^3.7.1",
+    "@types/node": "^24.9.2",
+    "@types/pg": "^8.15.5",
+    "tsx": "^4.20.6",
+    "typescript": "^5.9.3",
+    "vitest": "^3.2.4"
+  }
+}
