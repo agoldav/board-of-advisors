@@ -2,7 +2,7 @@
   "name": "board-of-advisors",
   "version": "0.1.0",
   "private": true,
-  "description": "AI board of advisors for small business owners — backend core (profile, model router, commitments).",
+  "description": "AI board of advisors for small business owners — profile, model router, commitments, advisors, document ingestion.",
   "type": "module",
   "engines": {
     "node": ">=20"
@@ -11,7 +11,8 @@
     "build": "tsc -p tsconfig.json && node --input-type=commonjs -e \"require('fs').cpSync('src/advisors/configs','dist/advisors/configs',{recursive:true})\"",
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "test": "vitest run",
-    "test:watch": "vitest"
+    "test:watch": "vitest",
+    "sweep-server": "tsx src/api/server.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.65.0",

@@ -29,6 +29,7 @@ import {
   saveRecommendation,
   startOperation,
 } from "./persistence.js";
+import { assertReadyForAdvice } from "../documents/validate.js";
 
 /** Friendly, resumable error for the "out of credits" path. */
 export class OutOfCreditsError extends Error {
@@ -205,11 +206,19 @@ export interface FirstReadingResult {
  * The first read: a cash reconciliation, not a summary (D-021). Facts are
  * computed deterministically from confirmed figures and handed to Opus, which
  * interprets them in real numbers while streaming to the screen.
+ *
+ * D-028: refuses unbalanced / unconfirmed-grade figures before any model call.
  */
 export async function firstReading(
   args: FirstReadingArgs,
   deps: EngineDeps = {},
 ): Promise<FirstReadingResult> {
+  // No advice from figures that do not reconcile (D-028).
+  assertReadyForAdvice(args.currentFigures);
+  if (args.previousFigures.length > 0) {
+    assertReadyForAdvice(args.previousFigures);
+  }
+
   const provider = deps.provider ?? createProvider();
   const advisor = getAdvisor("finance");
   const { model } = routeModel({ kind: "first_read" }); // -> Opus (D-021)

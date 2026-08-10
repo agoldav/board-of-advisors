@@ -628,20 +628,68 @@ vender el producto.
 
 ---
 
+**Sesión 2026-08-09 — Implementación Tareas 1-3 (construcción en Cursor)**
+
+**Decisión de stack:**
+- **TypeScript + Node, SQL puro con `pg` (sin ORM), luxon para fechas con zona horaria.** Confirmada contra la comparación TS/Node vs Python.
+
+**Tarea 1 — Esquema de base de datos (commit `8202b5c`):**
+- `db/migrations/0001_initial_schema.sql`: 11 tablas, 8 enums, índices y constraints. PostgreSQL, puro esquema sin lógica.
+- `owner_id` en todas las tablas (D-030); piso de 4096 tokens como CHECK en `profile_versions` (D-031); `vencido` prohibido como valor guardado y descarte con motivo obligatorio (D-033); set de trazabilidad en `recommendations` (D-035); extracción por renglón en `extracted_figures` (D-037); `input_state` en `llm_operations` para persist-before-call (D-029).
+- `db/README.md` con uso e invariantes.
+
+**Tarea 2 — Núcleo backend (commit `be220ec`):**
+- Perfil de negocio: render determinista byte-estable + servicio de versionado que mide con el tokenizer real y falla si baja de 4096 tokens (D-008/D-031).
+- Router de modelos: clasifica antes de llamar → Haiku/Sonnet/Opus (D-006/D-009); primer read a Opus (D-021). Cliente Anthropic con `cache_control`, streaming, `count_tokens`, `usage` y manejo de `refusal`.
+- Máquina de estados de compromisos: transiciones validadas y `vencido` calculado en lectura con la zona horaria del dueño (D-033).
+
+**Tarea 3 — Motor de asesores (commit `d13fc55`):**
+- `askAdvisor` (chat 1:1) y `firstReading` (reconciliación de caja en streaming — D-021/D-038).
+- Persist-before-call con mensaje amable de créditos agotados (D-029); recomendaciones con traza completa (D-035); `refusal` como error visible, no respuesta en blanco.
+- Config de asesores en YAML versionado (finanzas completo, operaciones como stub) + registry que renderiza el delta por asesor tras el prefijo cacheado (D-034).
+- Reconciliación pura: identidad contable, crecimiento período a período y detección de divergencia de caja (D-021/D-037).
+
+**Verificación:** 32 tests unitarios en verde; `tsc` estricto limpio; el build copia los YAML a `dist/`.
+
+---
+
+**Sesión 2026-08-09 — Tarea 4 (ingesta de PDF)**
+
+**Tarea 4 — Documentos (D-028 / D-037):**
+- `src/llm/client.ts`: `extractDocument` — PDF como document block nativo + tool forzado para extracción estructurada (sin librería de parseo).
+- `src/documents/`: ingest → extract (todos los renglones) → validación aritmética → confirmación / corrección / rechazo. Sin consejo hasta `confirmed` y cifras que cuadran.
+- Guard en `firstReading`: rechaza balance descuadrado antes de llamar al modelo.
+- Tests: estado inconsistente bloqueado; subtotales; parser del tool; gate de confirmación.
+
+**Verificación:** 45 tests unitarios en verde; `tsc` estricto limpio.
+
+---
+
+**Sesión 2026-08-09 — Tareas 8 y 13**
+
+**Tarea 8 — Barrido de compromisos (D-029 / D-036):**
+- `src/commitments/sweep.ts`: detecta vencidos (zona del dueño), inserta `followups` con clave de idempotencia, un email por compromiso/día.
+- `src/api/sweepAuth.ts` + `src/api/server.ts`: `POST /api/sweep` con secreto compartido (Bearer o `X-Sweep-Secret`).
+- `.github/workflows/commitment-sweep.yml`: cron diario → mismo endpoint.
+- Mailer enchufable (`ConsoleMailer`); destino vía `OWNER_NOTIFY_EMAIL` (sin columna email en owners).
+
+**Tarea 13 — Contador de gasto (D-032):**
+- `src/llm/spend.ts`: acumula desde `llm_operations.usage`; aviso ≥90% / señal ≥100%; sin freno duro.
+
+**Verificación:** 61 tests unitarios en verde; `tsc` estricto limpio.
+
+---
+
 ### ⏳ Pendiente
 
-**Bloqueadores inmediatos:**
+**Bloqueadores inmediatos (acción manual del dueño):**
 1. **Activar recarga automática en Anthropic** — Evitar sorpresas si los $20 iniciales se agotan.
    - [ ] Configurar en consola de Anthropic
    - [ ] Considerar API key aparte para esta app
-
-**Orden de construcción:**
-1. **Esquema de base de datos** — Solo tablas, sin lógica.
-2. **En paralelo:**
-   - Perfil del negocio (contexto cacheado)
-   - Capa de modelo (abstracción para enrutamiento Haiku/Sonnet/Opus)
-   - Subsistema de compromisos (máquina de estados)
-3. **Motor de consejo** — Espera a que capa de modelo esté lista
+2. **Secrets del barrido** (para que Actions funcione):
+   - [ ] `SWEEP_SHARED_SECRET` en host + GitHub Secrets
+   - [ ] `SWEEP_URL` en GitHub Secrets (URL pública del servidor)
+   - [ ] `OWNER_NOTIFY_EMAIL` en el host
 
 **Diferidos a v2:**
 - Resumen nocturno (Batch API)
@@ -651,6 +699,10 @@ vender el producto.
 - Cifrado de API keys en BD
 - Headroom (compresión de contexto)
 
+**Siguiente construcción probable (fuera del plan eng P1/P3 restante):**
+- UI / pantallas (confirmación de cifras, chat, first read, commitments)
+- Hosting del endpoint de barrido
+
 ---
 
-**Última actualización:** 2026-08-08 (Post-/plan-eng-review)
+**Última actualización:** 2026-08-09 (Tareas 4, 8, 13)
