@@ -39,6 +39,32 @@ export interface GenerateResult {
   model: ModelId;
 }
 
+/**
+ * Structured extraction from a PDF via a forced tool_use (D-028 / D-037).
+ * No cached business prefix: the document under analysis must not be mixed into
+ * the byte-stable cache path (D-008 / D-014).
+ */
+export interface ExtractDocumentParams {
+  model: ModelId;
+  /** Raw PDF bytes, base64-encoded (Anthropic document block). */
+  pdfBase64: string;
+  prompt: string;
+  tool: {
+    name: string;
+    description: string;
+    input_schema: Anthropic.Tool.InputSchema;
+  };
+  maxTokens?: number;
+}
+
+export interface ExtractDocumentResult {
+  /** Parsed `tool_use.input` from the forced tool call. */
+  toolInput: unknown;
+  stopReason: string | null;
+  usage: Usage;
+  model: ModelId;
+}
+
 export class RefusalError extends Error {
   constructor(message = "The model refused to answer (stop_reason: refusal).") {
     super(message);
@@ -53,6 +79,7 @@ export interface LlmProvider {
     params: GenerateParams,
     onDelta: (chunk: string) => void,
   ): Promise<GenerateResult>;
+  extractDocument(params: ExtractDocumentParams): Promise<ExtractDocumentResult>;
 }
 
 /**
@@ -152,6 +179,54 @@ export class AnthropicProvider implements LlmProvider {
       .map((b) => b.text)
       .join("");
     return { text, stopReason: final.stop_reason, usage: toUsage(final.usage), model: params.model };
+  }
+
+  /**
+   * Native PDF extraction: document block + forced tool for structured line items.
+   * No parsing library (D-028).
+   */
+  async extractDocument(params: ExtractDocumentParams): Promise<ExtractDocumentResult> {
+    const res = await this.client.messages.create({
+      model: params.model,
+      max_tokens: params.maxTokens ?? 8192,
+      tools: [
+        {
+          name: params.tool.name,
+          description: params.tool.description,
+          input_schema: params.tool.input_schema,
+        },
+      ],
+      tool_choice: { type: "tool", name: params.tool.name },
+      messages: [
+        {
+          role: "user",
+          content: [
+            {
+              type: "document",
+              source: {
+                type: "base64",
+                media_type: "application/pdf",
+                data: params.pdfBase64,
+              },
+            },
+            { type: "text", text: params.prompt },
+          ],
+        },
+      ],
+    });
+    if (res.stop_reason === "refusal") throw new RefusalError();
+    const toolBlock = res.content.find(
+      (b): b is Anthropic.ToolUseBlock => b.type === "tool_use",
+    );
+    if (!toolBlock) {
+      throw new Error("Extraction response had no tool_use block.");
+    }
+    return {
+      toolInput: toolBlock.input,
+      stopReason: res.stop_reason,
+      usage: toUsage(res.usage),
+      model: params.model,
+    };
   }
 }
 
