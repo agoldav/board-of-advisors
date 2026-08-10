@@ -1,0 +1,29 @@
+# Daily commitment follow-up sweep (D-029 / D-036).
+# Calls the same authenticated endpoint the host cron will call later —
+# swapping the trigger must not rewrite the logic.
+name: commitment-sweep
+
+on:
+  schedule:
+    # 13:00 UTC ≈ morning in America/Costa_Rica (UTC-6)
+    - cron: "0 13 * * *"
+  workflow_dispatch:
+
+jobs:
+  sweep:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger sweep endpoint
+        env:
+          SWEEP_URL: ${{ secrets.SWEEP_URL }}
+          SWEEP_SHARED_SECRET: ${{ secrets.SWEEP_SHARED_SECRET }}
+        run: |
+          set -euo pipefail
+          if [ -z "${SWEEP_URL}" ] || [ -z "${SWEEP_SHARED_SECRET}" ]; then
+            echo "SWEEP_URL and SWEEP_SHARED_SECRET must be set as GitHub Secrets."
+            exit 1
+          fi
+          curl -fsS -X POST "${SWEEP_URL}/api/sweep" \
+            -H "Authorization: Bearer ${SWEEP_SHARED_SECRET}" \
+            -H "Content-Type: application/json" \
+            -d '{}'
