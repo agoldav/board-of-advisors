@@ -2,6 +2,9 @@
  * HTTP surface for the commitment sweep (T8).
  * GitHub Actions (and later host cron) POST /api/sweep with the shared secret.
  * Logic lives in commitments/sweep.ts — swapping the trigger does not rewrite it.
+ *
+ * GET /health (and GET /) exist so free-tier hosts can health-check without
+ * triggering the sweep.
  */
 import { createServer, type IncomingMessage, type ServerResponse } from "node:http";
 import { pathToFileURL } from "node:url";
@@ -16,21 +19,38 @@ async function readBody(req: IncomingMessage): Promise<string> {
   return Buffer.concat(chunks).toString("utf8");
 }
 
+function sendJson(
+  res: ServerResponse,
+  status: number,
+  body: Record<string, unknown>,
+): void {
+  res.writeHead(status, { "content-type": "application/json" });
+  res.end(JSON.stringify(body));
+}
+
 export async function handleSweepRequest(
   req: IncomingMessage,
   res: ServerResponse,
 ): Promise<void> {
   try {
-    if (req.method !== "POST") {
-      res.writeHead(405, { "content-type": "application/json" });
-      res.end(JSON.stringify({ error: "Method not allowed" }));
+    const url = new URL(req.url ?? "/", "http://localhost");
+    const { pathname } = url;
+
+    if (
+      req.method === "GET" &&
+      (pathname === "/health" || pathname === "/")
+    ) {
+      sendJson(res, 200, { ok: true });
       return;
     }
 
-    const url = new URL(req.url ?? "/", "http://localhost");
-    if (url.pathname !== "/api/sweep") {
-      res.writeHead(404, { "content-type": "application/json" });
-      res.end(JSON.stringify({ error: "Not found" }));
+    if (pathname !== "/api/sweep") {
+      sendJson(res, 404, { error: "Not found" });
+      return;
+    }
+
+    if (req.method !== "POST") {
+      sendJson(res, 405, { error: "Method not allowed" });
       return;
     }
 
@@ -40,31 +60,28 @@ export async function handleSweepRequest(
     await readBody(req);
 
     const result = await runSweep();
-    res.writeHead(200, { "content-type": "application/json" });
-    res.end(JSON.stringify({ ok: true, ...result }));
+    sendJson(res, 200, { ok: true, ...result });
   } catch (err) {
     if (err instanceof SweepAuthError) {
-      res.writeHead(401, { "content-type": "application/json" });
-      res.end(JSON.stringify({ error: err.message }));
+      sendJson(res, 401, { error: err.message });
       return;
     }
     console.error("sweep failed", err);
-    res.writeHead(500, { "content-type": "application/json" });
-    res.end(
-      JSON.stringify({
-        error: err instanceof Error ? err.message : "Sweep failed",
-      }),
-    );
+    sendJson(res, 500, {
+      error: err instanceof Error ? err.message : "Sweep failed",
+    });
   }
 }
 
-/** Start a tiny server that only serves POST /api/sweep. */
+/** Start a tiny server: health checks + POST /api/sweep. */
 export function startSweepServer(port = Number(process.env.PORT ?? 8787)) {
   const server = createServer((req, res) => {
     void handleSweepRequest(req, res);
   });
   server.listen(port, () => {
-    console.log(`Sweep endpoint listening on :${port} (POST /api/sweep)`);
+    console.log(
+      `Sweep endpoint listening on :${port} (GET /health, POST /api/sweep)`,
+    );
   });
   return server;
 }
