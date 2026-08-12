@@ -48,4 +48,6 @@ export interface ConfirmationView {
   validation: ArithmeticValidation;
   /** Advice may only proceed when status=confirmed AND validation.ok. */
   readyForAdvice: boolean;
+  /** Original upload filename when known (`documents.original_path`). */
+  fileName?: string | null;
 }

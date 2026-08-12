@@ -1,4 +1,3 @@
-/** Public surface for document ingestion (Task 4). */
 export {
   ingestFinancialPdf,
   getConfirmationView,
@@ -10,6 +9,7 @@ export {
   DocumentNotFoundError,
   InvalidDocumentStateError,
 } from "./service.js";
+export { seedDemoDocument } from "./demoSeed.js";
 export {
   validateFigures,
   assertReadyForAdvice,

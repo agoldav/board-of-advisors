@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta name="design_doc_mode" content="canvas">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:ital,wght@0,400;0,500;0,600;0,700&family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  body { margin:0; background:#d9dedd; font-family:'Instrument Sans',sans-serif; -webkit-font-smoothing:antialiased; }
+  a { color:#00806a; text-decoration:none; }
+  a:hover { color:#0e1413; }
+  @keyframes riseIn { from { opacity:0; transform:translateY(6px); } to { opacity:1; transform:none; } }
+</style>
+</helmet>
+<template id="__bundler_thumbnail"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect width="100" height="100" fill="#0e1413"/><rect x="26" y="32" width="34" height="5" fill="#6d7876"/><rect x="26" y="46" width="48" height="5" fill="#e9eeec"/><rect x="26" y="58" width="40" height="5" fill="#e9eeec"/><rect x="26" y="72" width="24" height="5" fill="#3ddfb4"/></svg></template>
+
+<section style="display:flex;flex-direction:column;gap:28px;padding:72px 72px 120px">
+  <div style="display:flex;flex-direction:column;gap:6px;max-width:760px">
+    <div style="font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:#6d7876">Turno 4 · Pantalla C</div>
+    <div style="font-family:'Instrument Serif',serif;font-size:38px;line-height:1.1;color:#0e1413">Chat con asesor</div>
+    <div style="font-size:15px;line-height:1.55;color:#47514f">Un especialista a la vez. El hilo vive dentro de su asesor en el menú, y cuando la conversación llega a una acción con fecha, aparece el puente a compromiso.</div>
+  </div>
+
+  <div id="4a" style="display:flex;flex-direction:column;gap:18px">
+
+    <!-- ── CLARO ──────────────────────────────────────────── -->
+    <div style="width:1440px;height:900px;overflow:hidden;background:linear-gradient(168deg,#eef2f1 0%,#f8faf9 42%,#f2f5f4 100%);border:1px solid #cfd6d4;border-radius:6px;display:flex;box-shadow:0 24px 48px -20px rgba(14,20,19,.22)">
+      <div style="width:260px;flex:none;border-right:1px solid #e3e7e6;background:rgba(255,255,255,.55);display:flex;flex-direction:column;padding:26px 18px 22px">
+        <div style="display:flex;align-items:center;gap:10px;padding:0 8px 24px">
+          <div style="width:11px;height:11px;background:#00806a"></div>
+          <div style="font-family:'Instrument Serif',serif;font-size:19px;letter-spacing:-.2px;color:#0e1413">Board of Advisors</div>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px;padding:0 8px 10px">
+            <span style="width:14px;height:14px;flex:none;border:1px solid #cfd6d4;display:flex;align-items:center;justify-content:center;font-family:'Instrument Sans',sans-serif;font-size:12px;line-height:1;color:#98a19f;padding-bottom:1px">+</span>
+            <span style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:#98a19f">Create new advisor</span>
+          </div>
+        <div style="background:#ffffff;border:1px solid #e3e7e6;border-radius:8px;padding:12px 12px 8px;display:flex;flex-direction:column">
+          <div style="display:flex;align-items:center;justify-content:space-between;padding:0 2px 6px">
+            <span style="font-size:14px;font-weight:600;color:#0e1413">Financial Advisor</span>
+            <span style="font-family:'JetBrains Mono',monospace;font-size:11px;color:#00806a">3</span>
+          </div>
+          <div style="margin-left:5px;border-left:1px solid #cfd6d4;display:flex;flex-direction:column">
+            <div style="display:flex;align-items:center;padding:5px 0"><span style="width:13px;height:1px;background:#cfd6d4;flex:none;margin-right:8px"></span><span style="font-size:12px;font-weight:500;color:#2e3836">Where is the money</span></div>
+            <div style="margin-left:21px;border-left:1px solid #cfd6d4;display:flex;flex-direction:column">
+              <div style="display:flex;align-items:center;padding:5px 0"><span style="width:13px;height:1px;background:#cfd6d4;flex:none;margin-right:8px"></span><span style="font-size:12px;font-weight:500;color:#2e3836">Request 1 - 02/12/2026</span></div>
+            </div>
+            <div style="display:flex;align-items:center;padding:5px 0"><span style="width:13px;height:1px;background:#cfd6d4;flex:none;margin-right:8px"></span><span style="font-size:12px;font-style:italic;color:#2e3836">Plan savings for project A</span></div>
+            <div style="display:flex;align-items:center;padding:5px 0"><span style="width:13px;height:1px;background:#cfd6d4;flex:none;margin-right:8px"></span><span style="font-size:12px;font-style:italic;color:#2e3836">Create a cashflow projection</span></div>
+          </div>
+          <div style="display:flex;flex-direction:column;padding-top:8px">
+            <div style="display:flex;align-items:center;padding:6px 2px"><span style="font-size:14px;color:#47514f">Marketing Advisor</span></div>
+            <div style="display:flex;align-items:center;padding:6px 2px"><span style="font-size:14px;color:#47514f">Sales Advisor</span></div>
+            <div style="display:flex;align-items:center;padding:6px 2px"><span style="font-size:14px;color:#47514f">Operations Advisor</span></div>
+          </div>
+        </div>
+        <div style="padding-top:30px"><div style="display:flex;align-items:center;gap:8px;padding:0 8px 10px">
+            <span style="width:14px;height:14px;flex:none;border:1px solid #cfd6d4;display:flex;align-items:center;justify-content:center;font-family:'Instrument Sans',sans-serif;font-size:12px;line-height:1;color:#98a19f;padding-bottom:1px">+</span>
+            <span style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:#98a19f">Create new section</span>
+          </div></div>
+          <div style="display:flex;flex-direction:column;gap:2px">
+          <div style="display:flex;align-items:center;justify-content:space-between;padding:9px 10px;border-radius:6px">
+            <span style="font-size:14px;color:#47514f">Perfil Empresarial</span>
+          </div>
+          <div style="display:flex;align-items:center;justify-content:space-between;padding:9px 10px;border-radius:6px">
+            <span style="font-size:14px;color:#47514f">Sales Advisor</span><span style="width:18px;height:18px;flex:none;border-radius:9999px;background:#ff005f;display:flex;align-items:center;justify-content:center;font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:600;color:#ffffff;line-height:1;padding-left:.5px">2</span>
+          </div>
+          <div style="display:flex;align-items:center;justify-content:space-between;padding:9px 10px;border-radius:6px">
+            <span style="font-size:14px;color:#47514f">Operations Advisor</span><span style="font-family:'JetBrains Mono',monospace;font-size:11px;color:#6d7876;width:18px;flex:none;display:flex;justify-content:center">3</span>
+          </div>
+          <div style="display:flex;align-items:center;justify-content:space-between;padding:9px 10px;border-radius:6px">
+            <span style="font-size:14px;color:#47514f">Compromisos</span><span style="font-family:'JetBrains Mono',monospace;font-size:11px;color:#c0483f">1 vencido</span>
+          </div>
+          <div style="display:flex;align-items:center;justify-content:space-between;padding:9px 10px;border-radius:6px">
+            <span style="font-size:14px;color:#47514f">Documentos</span><span style="font-family:'JetBrains Mono',monospace;font-size:11px;color:#6d7876;width:18px;flex:none;display:flex;justify-content:center">50</span>
+          </div>
+        </div>
+        <div style="flex:1"></div>
+        <div style="border-top:1px solid #e3e7e6;padding:16px 10px 0;display:flex;flex-direction:column;gap:5px">
+          <div style="font-size:13px;font-weight:500;color:#0e1413">Siscon S.R.L.</div>
+          <div style="font-size:12px;color:#98a19f">Abraham · Goldgewicht - Gerente</div>
+        </div>
+      </div>
+
+      <div style="flex:1;display:flex;flex-direction:column;min-width:0">
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:22px 44px 18px;border-bottom:1px solid #e3e7e6">
+          <div style="display:flex;flex-direction:column;gap:5px">
+            <div style="display:flex;align-items:center;gap:10px">
+              <div style="width:9px;height:9px;background:#00806a"></div>
+              <div style="font-family:'Instrument Serif',serif;font-size:26px;line-height:1.1;color:#0e1413">Asesor Financiero</div>
+              <div style="font-size:13px;color:#6d7876;padding-left:2px">Cambiar de asesor</div>
+            </div>
+            <div style="font-family:'JetBrains Mono',monospace;font-size:11px;color:#98a19f;padding-left:19px">Where is the money · responde sobre las cifras confirmadas de junio</div>
+          </div>
+          <div style="font-family:'JetBrains Mono',monospace;font-size:11px;color:#6d7876">hoy · 7 jul 2026</div>
+        </div>
+
+        <div style="flex:1;overflow:hidden;padding:24px 44px 0;display:flex;flex-direction:column;gap:20px">
+
+          <div style="display:flex;flex-direction:column;gap:5px;max-width:860px">
+            <div style="display:flex;align-items:baseline;gap:9px">
+              <span style="font-size:13px;font-weight:600;color:#0e1413">Abraham</span>
+              <span style="font-family:'JetBrains Mono',monospace;font-size:11px;color:#98a19f">09:12</span>
+            </div>
+            <div style="font-size:15px;line-height:1.6;color:#26302e;text-wrap:pretty">¿Puedo contratar un ayudante más este mes? Tengo dos obras en paralelo en agosto.</div>
+          </div>
+
+          <div style="background:#ffffff;border:1px solid #e3e7e6;border-radius:8px;padding:14px 16px;display:flex;flex-direction:column;gap:7px;max-width:860px">
+            <div style="display:flex;align-items:center;gap:9px">
+              <span style="width:6px;height:6px;background:#00806a;flex:none"></span>
+              <span style="font-size:13px;font-weight:600;color:#0e1413">Asesor Financiero</span>
+              <span style="font-family:'JetBrains Mono',monospace;font-size:11px;color:#98a19f">09:12</span>
+            </div>
+            <div style="font-size:15px;line-height:1.6;color:#26302e;text-wrap:pretty">Con las cifras de junio, todavía no. En banco hay <span style="font-family:'JetBrains Mono',monospace">3,000</span> y debes <span style="font-family:'JetBrains Mono',monospace">16,800</span> entre préstamo e impuestos. Un ayudante con cargas te cuesta cerca de <span style="font-family:'JetBrains Mono',monospace">950</span> al mes, y el problema no es el monto: es que el salario se paga quincenal y tus clientes pagan a cuarenta días.</div>
+            <div style="font-size:15px;line-height:1.6;color:#26302e;text-wrap:pretty">Lo que cambiaría mi respuesta es cuánto de los <span style="font-family:'JetBrains Mono',monospace">10,000</span> por cobrar entra antes del 15 de agosto.</div>
+          </div>
+
+          <div style="display:flex;flex-direction:column;gap:5px;max-width:860px">
+            <div style="display:flex;align-items:baseline;gap:9px">
+              <span style="font-size:13px;font-weight:600;color:#0e1413">Abraham</span>
+              <span style="font-family:'JetBrains Mono',monospace;font-size:11px;color:#98a19f">09:18</span>
+            </div>
+            <div style="font-size:15px;line-height:1.6;color:#26302e;text-wrap:pretty">Vega dice que paga 4,200 el 15 de julio. Los otros dos no contestan.</div>
+          </div>
+
+          <div style="background:#ffffff;border:1px solid #e3e7e6;border-radius:8px;padding:14px 16px 0;display:flex;flex-direction:column;gap:7px;max-width:860px;animation:riseIn .5s ease both">
+            <div style="display:flex;align-items:center;gap:9px">
+              <span style="width:6px;height:6px;background:#00806a;flex:none"></span>
+              <span style="font-size:13px;font-weight:600;color:#0e1413">Asesor Financiero</span>
+              <span style="font-family:'JetBrains Mono',monospace;font-size:11px;color:#98a19f">09:19</span>
+            </div>
+            <div style="font-size:15px;line-height:1.6;color:#26302e;text-wrap:pretty">Entonces la pregunta no es si contratas: es si cobras. Con esos <span style="font-family:'JetBrains Mono',monospace">4,200</span> quedas en <span style="font-family:'JetBrains Mono',monospace">7,200</span> de caja contra <span style="font-family:'JetBrains Mono',monospace">16,800</span> de obligaciones. Sigue apretado, pero deja de ser un no.</div>
+            <div style="display:flex;align-items:center;justify-content:space-between;gap:24px;margin:5px -16px 0;padding:12px 16px;border-top:1px solid #e8ecec;background:#fafbfb;border-radius:0 0 7px 7px">
+              <div style="display:flex;flex-direction:column;gap:4px;min-width:0">
+                <div style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:#98a19f">Recomendación</div>
+                <div style="font-size:15px;font-weight:500;color:#0e1413">Pedirle a Vega la fecha de pago por escrito y escalar los otros dos al correo de administración.</div>
+                <div style="font-family:'JetBrains Mono',monospace;font-size:12px;color:#00806a">vence vie 18 jul 2026</div>
+              </div>
+              <button style="background:#0e1413;border:none;border-radius:9999px;font-family:'Instrument Sans',sans-serif;font-size:13px;font-weight:500;color:#ffffff;padding:9px 20px;cursor:pointer;flex:none">Convertir en compromiso</button>
+            </div>
+          </div>
+        </div>
+
+        <div style="padding:16px 44px 20px">
+          <div style="height:112px;background:#ffffff;border:1px solid #cfd6d4;border-radius:10px;display:flex;flex-direction:column;overflow:hidden;max-width:860px">
+            <div style="flex:1;padding:12px 16px;display:flex;align-items:flex-start;gap:2px">
+              <div style="font-size:15px;line-height:1.6;color:#98a19f">Pregúntale al Asesor Financiero…</div>
+              <div style="width:1.5px;height:22px;background:#0e1413;margin-top:1px"></div>
+            </div>
+            <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 12px 8px 16px;border-top:1px solid #e8ecec;background:#fafbfb">
+              <div style="display:flex;align-items:center;gap:10px">
+                <button title="Adjuntar archivo" style="width:24px;height:24px;flex:none;border:1px solid #cfd6d4;border-radius:9999px;background:transparent;color:#47514f;font-family:'Instrument Sans',sans-serif;font-size:16px;line-height:1;display:flex;align-items:center;justify-content:center;padding:0 0 1px;cursor:pointer">+</button>
+                <div style="font-family:'JetBrains Mono',monospace;font-size:11px;color:#98a19f">Habla con un asesor a la vez</div>
+              </div>
+              <button style="background:#0e1413;border:none;border-radius:9999px;font-family:'Instrument Sans',sans-serif;font-size:13px;font-weight:500;color:#ffffff;padding:8px 20px;cursor:pointer">Enviar</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── OSCURO ─────────────────────────────────────────── -->
+    <div style="width:1440px;height:900px;overflow:hidden;background:radial-gradient(1100px 700px at 12% -10%,#12211e 0%,#0a0d0d 62%);border:1px solid #1e2624;border-radius:6px;display:flex;box-shadow:0 24px 48px -20px rgba(0,0,0,.5)">
+      <div style="width:260px;flex:none;border-right:1px solid #1e2624;background:rgba(255,255,255,.02);display:flex;flex-direction:column;padding:26px 18px 22px">
+        <div style="display:flex;align-items:center;gap:10px;padding:0 8px 24px">
+          <div style="width:11px;height:11px;background:#3ddfb4"></div>
+          <div style="font-family:'Instrument Serif',serif;font-size:19px;letter-spacing:-.2px;color:#e9eeec">Board of Advisors</div>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px;padding:0 8px 10px">
+            <span style="width:14px;height:14px;flex:none;border:1px solid #2a3432;display:flex;align-items:center;justify-content:center;font-family:'Instrument Sans',sans-serif;font-size:12px;line-height:1;color:#5f6a67;padding-bottom:1px">+</span>
+            <span style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:#5f6a67">Create new advisor</span>
+          </div>
+        <div style="background:#101514;border:1px solid #1e2624;border-radius:8px;padding:12px 12px 8px;display:flex;flex-direction:column">
+          <div style="display:flex;align-items:center;justify-content:space-between;padding:0 2px 6px">
+            <span style="font-size:14px;font-weight:600;color:#e9eeec">Financial Advisor</span>
+            <span style="font-family:'JetBrains Mono',monospace;font-size:11px;color:#3ddfb4">3</span>
+          </div>
+          <div style="margin-left:5px;border-left:1px solid #2a3432;display:flex;flex-direction:column">
+            <div style="display:flex;align-items:center;padding:5px 0"><span style="width:13px;height:1px;background:#2a3432;flex:none;margin-right:8px"></span><span style="font-size:12px;font-weight:500;color:#cbd4d1">Where is the money</span></div>
+            <div style="margin-left:21px;border-left:1px solid #2a3432;display:flex;flex-direction:column">
+              <div style="display:flex;align-items:center;padding:5px 0"><span style="width:13px;height:1px;background:#2a3432;flex:none;margin-right:8px"></span><span style="font-size:12px;font-weight:500;color:#cbd4d1">Request 1 - 02/12/2026</span></div>
+            </div>
+            <div style="display:flex;align-items:center;padding:5px 0"><span style="width:13px;height:1px;background:#2a3432;flex:none;margin-right:8px"></span><span style="font-size:12px;font-style:italic;color:#cbd4d1">Plan savings for project A</span></div>
+            <div style="display:flex;align-items:center;padding:5px 0"><span style="width:13px;height:1px;background:#2a3432;flex:none;margin-right:8px"></span><span style="font-size:12px;font-style:italic;color:#cbd4d1">Create a cashflow projection</span></div>
+          </div>
+          <div style="display:flex;flex-direction:column;padding-top:8px">
+            <div style="display:flex;align-items:center;padding:6px 2px"><span style="font-size:14px;color:#b9c3c0">Marketing Advisor</span></div>
+            <div style="display:flex;align-items:center;padding:6px 2px"><span style="font-size:14px;color:#b9c3c0">Sales Advisor</span></div>
+            <div style="display:flex;align-items:center;padding:6px 2px"><span style="font-size:14px;color:#b9c3c0">Operations Advisor</span></div>
+          </div>
+        </div>
+        <div style="padding-top:30px"><div style="display:flex;align-items:center;gap:8px;padding:0 8px 10px">
+            <span style="width:14px;height:14px;flex:none;border:1px solid #2a3432;display:flex;align-items:center;justify-content:center;font-family:'Instrument Sans',sans-serif;font-size:12px;line-height:1;color:#5f6a67;padding-bottom:1px">+</span>
+            <span style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:#5f6a67">Create new section</span>
+          </div></div>
+          <div style="display:flex;flex-direction:column;gap:2px">
+          <div style="display:flex;align-items:center;justify-content:space-between;padding:9px 10px;border-radius:6px">
+            <span style="font-size:14px;color:#b9c3c0">Perfil Empresarial</span>
+          </div>
+          <div style="display:flex;align-items:center;justify-content:space-between;padding:9px 10px;border-radius:6px">
+            <span style="font-size:14px;color:#b9c3c0">Sales Advisor</span><span style="width:18px;height:18px;flex:none;border-radius:9999px;background:#ff005f;display:flex;align-items:center;justify-content:center;font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:600;color:#ffffff;line-height:1;padding-left:.5px">2</span>
+          </div>
+          <div style="display:flex;align-items:center;justify-content:space-between;padding:9px 10px;border-radius:6px">
+            <span style="font-size:14px;color:#b9c3c0">Operations Advisor</span><span style="font-family:'JetBrains Mono',monospace;font-size:11px;color:#7f8a87;width:18px;flex:none;display:flex;justify-content:center">3</span>
+          </div>
+          <div style="display:flex;align-items:center;justify-content:space-between;padding:9px 10px;border-radius:6px">
+            <span style="font-size:14px;color:#b9c3c0">Compromisos</span><span style="font-family:'JetBrains Mono',monospace;font-size:11px;color:#e07a70">1 vencido</span>
+          </div>
+          <div style="display:flex;align-items:center;justify-content:space-between;padding:9px 10px;border-radius:6px">
+            <span style="font-size:14px;color:#b9c3c0">Documentos</span><span style="font-family:'JetBrains Mono',monospace;font-size:11px;color:#7f8a87;width:18px;flex:none;display:flex;justify-content:center">50</span>
+          </div>
+        </div>
+        <div style="flex:1"></div>
+        <div style="border-top:1px solid #1e2624;padding:16px 10px 0;display:flex;flex-direction:column;gap:5px">
+          <div style="font-size:13px;font-weight:500;color:#e9eeec">Siscon S.R.L.</div>
+          <div style="font-size:12px;color:#5f6a67">Abraham · Goldgewicht - Gerente</div>
+        </div>
+      </div>
+
+      <div style="flex:1;display:flex;flex-direction:column;min-width:0">
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:22px 44px 18px;border-bottom:1px solid #1e2624">
+          <div style="display:flex;flex-direction:column;gap:5px">
+            <div style="display:flex;align-items:center;gap:10px">
+              <div style="width:9px;height:9px;background:#3ddfb4"></div>
+              <div style="font-family:'Instrument Serif',serif;font-size:26px;line-height:1.1;color:#e9eeec">Asesor Financiero</div>
+              <div style="font-size:13px;color:#7f8a87;padding-left:2px">Cambiar de asesor</div>
+            </div>
+            <div style="font-family:'JetBrains Mono',monospace;font-size:11px;color:#5f6a67;padding-left:19px">Where is the money · responde sobre las cifras confirmadas de junio</div>
+          </div>
+          <div style="font-family:'JetBrains Mono',monospace;font-size:11px;color:#7f8a87">hoy · 7 jul 2026</div>
+        </div>
+
+        <div style="flex:1;overflow:hidden;padding:24px 44px 0;display:flex;flex-direction:column;gap:20px">
+
+          <div style="display:flex;flex-direction:column;gap:5px;max-width:860px">
+            <div style="display:flex;align-items:baseline;gap:9px">
+              <span style="font-size:13px;font-weight:600;color:#e9eeec">Abraham</span>
+              <span style="font-family:'JetBrains Mono',monospace;font-size:11px;color:#5f6a67">09:12</span>
+            </div>
+            <div style="font-size:15px;line-height:1.6;color:#cbd4d1;text-wrap:pretty">¿Puedo contratar un ayudante más este mes? Tengo dos obras en paralelo en agosto.</div>
+          </div>
+
+          <div style="background:#101514;border:1px solid #1e2624;border-radius:8px;padding:14px 16px;display:flex;flex-direction:column;gap:7px;max-width:860px">
+            <div style="display:flex;align-items:center;gap:9px">
+              <span style="width:6px;height:6px;background:#3ddfb4;flex:none"></span>
+              <span style="font-size:13px;font-weight:600;color:#e9eeec">Asesor Financiero</span>
+              <span style="font-family:'JetBrains Mono',monospace;font-size:11px;color:#5f6a67">09:12</span>
+            </div>
+            <div style="font-size:15px;line-height:1.6;color:#cbd4d1;text-wrap:pretty">Con las cifras de junio, todavía no. En banco hay <span style="font-family:'JetBrains Mono',monospace">3,000</span> y debes <span style="font-family:'JetBrains Mono',monospace">16,800</span> entre préstamo e impuestos. Un ayudante con cargas te cuesta cerca de <span style="font-family:'JetBrains Mono',monospace">950</span> al mes, y el problema no es el monto: es que el salario se paga quincenal y tus clientes pagan a cuarenta días.</div>
+            <div style="font-size:15px;line-height:1.6;color:#cbd4d1;text-wrap:pretty">Lo que cambiaría mi respuesta es cuánto de los <span style="font-family:'JetBrains Mono',monospace">10,000</span> por cobrar entra antes del 15 de agosto.</div>
+          </div>
+
+          <div style="display:flex;flex-direction:column;gap:5px;max-width:860px">
+            <div style="display:flex;align-items:baseline;gap:9px">
+              <span style="font-size:13px;font-weight:600;color:#e9eeec">Abraham</span>
+              <span style="font-family:'JetBrains Mono',monospace;font-size:11px;color:#5f6a67">09:18</span>
+            </div>
+            <div style="font-size:15px;line-height:1.6;color:#cbd4d1;text-wrap:pretty">Vega dice que paga 4,200 el 15 de julio. Los otros dos no contestan.</div>
+          </div>
+
+          <div style="background:#101514;border:1px solid #1e2624;border-radius:8px;padding:14px 16px 0;display:flex;flex-direction:column;gap:7px;max-width:860px;animation:riseIn .5s ease both">
+            <div style="display:flex;align-items:center;gap:9px">
+              <span style="width:6px;height:6px;background:#3ddfb4;flex:none"></span>
+              <span style="font-size:13px;font-weight:600;color:#e9eeec">Asesor Financiero</span>
+              <span style="font-family:'JetBrains Mono',monospace;font-size:11px;color:#5f6a67">09:19</span>
+            </div>
+            <div style="font-size:15px;line-height:1.6;color:#cbd4d1;text-wrap:pretty">Entonces la pregunta no es si contratas: es si cobras. Con esos <span style="font-family:'JetBrains Mono',monospace">4,200</span> quedas en <span style="font-family:'JetBrains Mono',monospace">7,200</span> de caja contra <span style="font-family:'JetBrains Mono',monospace">16,800</span> de obligaciones. Sigue apretado, pero deja de ser un no.</div>
+            <div style="display:flex;align-items:center;justify-content:space-between;gap:24px;margin:5px -16px 0;padding:12px 16px;border-top:1px solid #1a201f;background:#0d1211;border-radius:0 0 7px 7px">
+              <div style="display:flex;flex-direction:column;gap:4px;min-width:0">
+                <div style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:#5f6a67">Recomendación</div>
+                <div style="font-size:15px;font-weight:500;color:#e9eeec">Pedirle a Vega la fecha de pago por escrito y escalar los otros dos al correo de administración.</div>
+                <div style="font-family:'JetBrains Mono',monospace;font-size:12px;color:#3ddfb4">vence vie 18 jul 2026</div>
+              </div>
+              <button style="background:#e9eeec;border:none;border-radius:9999px;font-family:'Instrument Sans',sans-serif;font-size:13px;font-weight:500;color:#0a0d0d;padding:9px 20px;cursor:pointer;flex:none">Convertir en compromiso</button>
+            </div>
+          </div>
+        </div>
+
+        <div style="padding:16px 44px 20px">
+          <div style="height:112px;background:#101514;border:1px solid #2a3432;border-radius:10px;display:flex;flex-direction:column;overflow:hidden;max-width:860px">
+            <div style="flex:1;padding:12px 16px;display:flex;align-items:flex-start;gap:2px">
+              <div style="font-size:15px;line-height:1.6;color:#5f6a67">Pregúntale al Asesor Financiero…</div>
+              <div style="width:1.5px;height:22px;background:#e9eeec;margin-top:1px"></div>
+            </div>
+            <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 12px 8px 16px;border-top:1px solid #1e2624;background:#0d1211">
+              <div style="display:flex;align-items:center;gap:10px">
+                <button title="Adjuntar archivo" style="width:24px;height:24px;flex:none;border:1px solid #2a3432;border-radius:9999px;background:transparent;color:#b9c3c0;font-family:'Instrument Sans',sans-serif;font-size:16px;line-height:1;display:flex;align-items:center;justify-content:center;padding:0 0 1px;cursor:pointer">+</button>
+                <div style="font-family:'JetBrains Mono',monospace;font-size:11px;color:#5f6a67">Habla con un asesor a la vez</div>
+              </div>
+              <button style="background:#e9eeec;border:none;border-radius:9999px;font-family:'Instrument Sans',sans-serif;font-size:13px;font-weight:500;color:#0a0d0d;padding:8px 20px;cursor:pointer">Enviar</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+</x-dc>
+</body>
+</html>
