@@ -13,7 +13,8 @@
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "test": "vitest run",
     "test:watch": "vitest",
-    "sweep-server": "tsx src/api/server.ts",
+    "sweep-server": "tsx --env-file=.env src/api/server.ts",
+    "dev:api": "tsx --env-file=.env src/api/server.ts",
     "web:dev": "npm --prefix web run dev",
     "web:build": "npm --prefix web run build"
   },

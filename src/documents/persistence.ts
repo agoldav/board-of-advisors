@@ -14,6 +14,7 @@ export interface DocumentRow {
   status: DocumentStatus;
   periodStart: string | null;
   periodEnd: string | null;
+  originalPath: string | null;
 }
 
 export async function insertDocument(args: {
@@ -117,9 +118,10 @@ export async function loadDocument(
       status: DocumentStatus;
       period_start: string | null;
       period_end: string | null;
+      original_path: string | null;
     }>(
       `SELECT id, owner_id, kind, status,
-              period_start::text, period_end::text
+              period_start::text, period_end::text, original_path
          FROM documents
         WHERE id = $1 AND owner_id = $2`,
       [documentId, ownerId],
@@ -133,6 +135,7 @@ export async function loadDocument(
       status: row.status,
       periodStart: row.period_start,
       periodEnd: row.period_end,
+      originalPath: row.original_path,
     };
   });
 }

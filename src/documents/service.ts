@@ -84,6 +84,7 @@ async function buildConfirmationView(
     figures,
     validation,
     readyForAdvice: doc.status === "confirmed" && validation.ok,
+    fileName: doc.originalPath,
   };
 }
 

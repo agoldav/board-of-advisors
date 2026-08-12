@@ -1,0 +1,796 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta name="design_doc_mode" content="canvas">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:ital,wght@0,400;0,500;0,600;0,700&amp;family=Instrument+Serif:ital@0;1&amp;family=JetBrains+Mono:wght@400;500;600&amp;display=swap" rel="stylesheet">
+<style>
+  body { margin:0; background:#d9dedd; font-family:'Instrument Sans',sans-serif; -webkit-font-smoothing:antialiased; }
+  a { color:#00806a; text-decoration:none; }
+  a:hover { color:#0e1413; }
+  @keyframes riseIn { from { opacity:0; transform:translateY(6px); } to { opacity:1; transform:none; } }
+</style>
+</helmet>
+
+<template id="__bundler_thumbnail"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect width="100" height="100" fill="#0e1413"></rect><rect x="30" y="30" width="40" height="6" fill="#3ddfb4"></rect><rect x="30" y="44" width="40" height="4" fill="#6d7876"></rect><rect x="30" y="54" width="28" height="4" fill="#6d7876"></rect><rect x="30" y="64" width="34" height="6" fill="#e9eeec"></rect></svg></template>
+
+<section style="display:flex;flex-direction:column;gap:28px;padding:72px 72px 120px">
+  <div style="display:flex;flex-direction:column;gap:6px;max-width:760px">
+    <div style="font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:#6d7876">Turno 1 · Pantalla A</div>
+    <div style="font-family:'Instrument Serif',serif;font-size:38px;line-height:1.1;color:#0e1413">Confirmación de cifras</div>
+    <div style="font-size:15px;line-height:1.55;color:#47514f">Dos lecturas del mismo trabajo: <a href="#1a">1a</a> trata las cifras como un libro contable dentro del producto; <a href="#1b">1b</a> las enfrenta contra el PDF de origen. Cada una en claro y oscuro.</div>
+  </div>
+
+  <div style="display:flex;gap:56px;align-items:flex-start;flex-wrap:wrap">
+
+    <div id="1a" style="display:flex;flex-direction:column;gap:18px">
+      <div style="display:flex;align-items:baseline;gap:12px">
+        <div style="font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:600;color:#0e1413;background:#ffffff;border:1px solid #cfd6d4;border-radius:9999px;padding:4px 12px">1a</div>
+        <div style="font-size:15px;font-weight:600;color:#0e1413">Libro de revisión</div>
+        <div style="font-size:14px;color:#6d7876">Navegación permanente · todos los renglones a la vista</div>
+      </div>
+
+      <!-- ── 1a LIGHT ───────────────────────────────────────── -->
+      <div style="width:1440px;height:970px;overflow:hidden;background:linear-gradient(168deg,#eef2f1 0%,#f8faf9 42%,#f2f5f4 100%);border:1px solid #cfd6d4;border-radius:6px;display:flex;box-shadow:0 24px 48px -20px rgba(14,20,19,.22)">
+        <div style="width:260px;flex:none;border-right:1px solid #e3e7e6;background:rgba(255,255,255,.55);display:flex;flex-direction:column;padding:26px 18px 22px">
+        <div style="display:flex;align-items:center;gap:10px;padding:0 8px 24px">
+          <div style="width:11px;height:11px;background:#00806a"></div>
+          <div style="font-family:'Instrument Serif',serif;font-size:19px;letter-spacing:-.2px;color:#0e1413">Board of Advisors</div>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px;padding:0 8px 10px">
+            <span style="width:14px;height:14px;flex:none;border:1px solid #cfd6d4;display:flex;align-items:center;justify-content:center;font-family:'Instrument Sans',sans-serif;font-size:12px;line-height:1;color:#98a19f;padding-bottom:1px">+</span>
+            <span style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:#98a19f">Create new advisor</span>
+          </div>
+        <div style="background:#ffffff;border:1px solid #e3e7e6;border-radius:8px;padding:12px 12px 8px;display:flex;flex-direction:column">
+          <div style="display:flex;align-items:center;justify-content:space-between;padding:0 2px 6px">
+            <span style="font-size:14px;font-weight:600;color:#0e1413">Financial Advisor</span>
+            <span style="font-family:'JetBrains Mono',monospace;font-size:11px;color:#00806a">3</span>
+          </div>
+          <div style="margin-left:5px;border-left:1px solid #cfd6d4;display:flex;flex-direction:column">
+            <div style="display:flex;align-items:center;padding:5px 0"><span style="width:13px;height:1px;background:#cfd6d4;flex:none;margin-right:8px"></span><span style="font-size:12px;font-weight:500;color:#2e3836">Where is the money</span></div>
+            <div style="margin-left:21px;border-left:1px solid #cfd6d4;display:flex;flex-direction:column">
+              <div style="display:flex;align-items:center;padding:5px 0"><span style="width:13px;height:1px;background:#cfd6d4;flex:none;margin-right:8px"></span><span style="font-size:12px;font-weight:500;color:#2e3836">Request 1 - 02/12/2026</span></div>
+            </div>
+            <div style="display:flex;align-items:center;padding:5px 0"><span style="width:13px;height:1px;background:#cfd6d4;flex:none;margin-right:8px"></span><span style="font-size:12px;font-style:italic;color:#2e3836">Plan savings for project A</span></div>
+            <div style="display:flex;align-items:center;padding:5px 0"><span style="width:13px;height:1px;background:#cfd6d4;flex:none;margin-right:8px"></span><span style="font-size:12px;font-style:italic;color:#2e3836">Create a cashflow projection</span></div>
+          </div>
+          <div style="display:flex;flex-direction:column;padding-top:8px">
+            <div style="display:flex;align-items:center;padding:6px 2px"><span style="font-size:14px;color:#47514f">Marketing Advisor</span></div>
+            <div style="display:flex;align-items:center;padding:6px 2px"><span style="font-size:14px;color:#47514f">Sales Advisor</span></div>
+            <div style="display:flex;align-items:center;padding:6px 2px"><span style="font-size:14px;color:#47514f">Operations Advisor</span></div>
+          </div>
+        </div>
+        <div style="padding-top:30px"><div style="display:flex;align-items:center;gap:8px;padding:0 8px 10px">
+            <span style="width:14px;height:14px;flex:none;border:1px solid #cfd6d4;display:flex;align-items:center;justify-content:center;font-family:'Instrument Sans',sans-serif;font-size:12px;line-height:1;color:#98a19f;padding-bottom:1px">+</span>
+            <span style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:#98a19f">Create new section</span>
+          </div></div>
+          <div style="display:flex;flex-direction:column;gap:2px">
+          <div style="display:flex;align-items:center;justify-content:space-between;padding:9px 10px;border-radius:6px">
+            <span style="font-size:14px;color:#47514f">Perfil Empresarial</span>
+          </div>
+          <div style="display:flex;align-items:center;justify-content:space-between;padding:9px 10px;border-radius:6px">
+            <span style="font-size:14px;color:#47514f">Sales Advisor</span><span style="width:18px;height:18px;flex:none;border-radius:9999px;background:#ff005f;display:flex;align-items:center;justify-content:center;font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:600;color:#ffffff;line-height:1;padding-left:.5px">2</span>
+          </div>
+          <div style="display:flex;align-items:center;justify-content:space-between;padding:9px 10px;border-radius:6px">
+            <span style="font-size:14px;color:#47514f">Operations Advisor</span><span style="font-family:'JetBrains Mono',monospace;font-size:11px;color:#6d7876;width:18px;flex:none;display:flex;justify-content:center">3</span>
+          </div>
+          <div style="display:flex;align-items:center;justify-content:space-between;padding:9px 10px;border-radius:6px">
+            <span style="font-size:14px;color:#47514f">Compromisos</span><span style="font-family:'JetBrains Mono',monospace;font-size:11px;color:#c0483f">1 vencido</span>
+          </div>
+          <div style="display:flex;align-items:center;justify-content:space-between;padding:9px 10px;border-radius:6px">
+            <span style="font-size:14px;color:#47514f">Documentos</span><span style="font-family:'JetBrains Mono',monospace;font-size:11px;color:#6d7876;width:18px;flex:none;display:flex;justify-content:center">50</span>
+          </div>
+        </div>
+        <div style="flex:1"></div>
+        <div style="border-top:1px solid #e3e7e6;padding:16px 10px 0;display:flex;flex-direction:column;gap:5px">
+          <div style="font-size:13px;font-weight:500;color:#0e1413">Siscon S.R.L.</div>
+          <div style="font-size:12px;color:#98a19f">Abraham · Goldgewicht - Gerente</div>
+        </div>
+      </div>
+
+      <div style="flex:1;display:flex;flex-direction:column;min-width:0">
+          <div style="display:flex;align-items:flex-end;justify-content:space-between;padding:34px 40px 22px;border-bottom:1px solid #e3e7e6">
+            <div style="display:flex;flex-direction:column;gap:8px">
+              <div style="font-family:'Instrument Serif',serif;font-size:34px;line-height:1.1;color:#0e1413">Confirma lo que leí de tus estados</div>
+              <div style="font-size:14px;line-height:1.5;color:#47514f;max-width:520px">Sin cifras confirmadas el board no da consejo. Revisa cada renglón, corrige lo que esté mal.</div>
+            </div>
+            <div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px;padding-bottom:4px">
+              <div style="font-family:'JetBrains Mono',monospace;font-size:12px;color:#0e1413">estados_2026_jun.pdf</div>
+              <div style="font-family:'JetBrains Mono',monospace;font-size:11px;color:#98a19f">7 páginas · extraído hoy 09:14</div>
+            </div>
+          </div>
+
+          <div style="flex:1;overflow:hidden;padding:20px 40px 0;display:flex;flex-direction:column;gap:18px">
+            <sc-if value="{{ balanceOk }}" hint-placeholder-val="{{ true }}">
+              <div style="display:flex;align-items:center;gap:14px;padding:13px 18px;border:1px solid #b8e3d5;background:#effaf6;border-radius:8px;animation:riseIn .5s ease both">
+                <div style="width:8px;height:8px;border-radius:9999px;background:#00b48a"></div>
+                <div style="font-size:14px;font-weight:500;color:#0e1413">La aritmética cuadra</div>
+                <div style="font-family:'JetBrains Mono',monospace;font-size:13px;color:#00806a">activos 62,200 = pasivo 26,600 + patrimonio 35,600</div>
+              </div>
+            </sc-if>
+            <sc-if value="{{ balanceError }}" hint-placeholder-val="{{ false }}">
+              <div style="display:flex;align-items:center;gap:14px;padding:13px 18px;border:1px solid #eec3bf;background:#fdf2f1;border-radius:8px">
+                <div style="width:8px;height:8px;border-radius:9999px;background:#c0483f"></div>
+                <div style="font-size:14px;font-weight:500;color:#0e1413">Los totales no cuadran por 1,400</div>
+                <div style="font-family:'JetBrains Mono',monospace;font-size:13px;color:#c0483f">activos 62,200 ≠ pasivo 26,600 + patrimonio 34,200</div>
+              </div>
+            </sc-if>
+
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:28px;min-height:0">
+
+              <div style="display:flex;flex-direction:column;border:1px solid #e3e7e6;border-radius:8px;background:#ffffff;overflow-y:auto">
+                <div style="display:flex;align-items:baseline;justify-content:space-between;padding:14px 20px;border-bottom:1px solid #e3e7e6">
+                  <div style="font-size:15px;font-weight:600;color:#0e1413">Balance general</div>
+                  <div style="font-family:'JetBrains Mono',monospace;font-size:11px;color:#98a19f">al 30 jun 2026 · USD</div>
+                </div>
+                <div style="display:grid;grid-template-columns:1fr 62px 132px 62px;gap:14px;padding:8px 20px;border-bottom:1px solid #e3e7e6;font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:#98a19f">
+                  <div>Cuenta</div><div>Pág.</div><div style="text-align:right">Monto</div><div style="text-align:right">Conf.</div>
+                </div>
+                <div style="padding:6px 20px 4px;font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:#6d7876">Activos</div>
+                <sc-for list="{{ activosA }}" as="r" hint-placeholder-count="1">
+                  <div style="display:grid;grid-template-columns:1fr 62px 132px 62px;gap:14px;align-items:center;padding:7px 20px;border-bottom:1px solid #f0f3f2">
+                    <div style="font-size:14px;color:#26302e">{{ r.c }}</div>
+                    <div style="font-family:'JetBrains Mono',monospace;font-size:11px;color:#98a19f">{{ r.p }}</div>
+                    <div style="font-family:'JetBrains Mono',monospace;font-size:14px;color:#0e1413;text-align:right;font-variant-numeric:tabular-nums">{{ r.m }}</div>
+                    <div style="font-family:'JetBrains Mono',monospace;font-size:11px;color:#98a19f;text-align:right">{{ r.v }}</div>
+                  </div>
+                </sc-for>
+                <div style="display:grid;grid-template-columns:1fr 62px 132px 62px;gap:14px;align-items:center;padding:7px 20px;border-bottom:1px solid #f0f3f2;background:#f3f7f6">
+                    <div style="display:flex;align-items:center;gap:7px">
+                      <span style="font-family:'JetBrains Mono',monospace;font-size:9px;color:#00806a;line-height:1">▼</span>
+                      <span style="font-size:14px;font-weight:500;color:#0e1413">Cuentas por cobrar</span>
+                      <span style="font-family:'JetBrains Mono',monospace;font-size:10px;color:#98a19f">3 facturas</span>
+                    </div>
+                    <div style="font-family:'JetBrains Mono',monospace;font-size:11px;color:#98a19f">p.2</div>
+                    <div style="font-family:'JetBrains Mono',monospace;font-size:14px;color:#0e1413;text-align:right;font-variant-numeric:tabular-nums">10,000</div>
+                    <div style="font-family:'JetBrains Mono',monospace;font-size:11px;color:#98a19f;text-align:right">99%</div>
+                  </div>
+                  <div style="display:grid;grid-template-columns:1fr 62px 132px 62px;gap:14px;align-items:center;padding:6px 20px 6px 41px;background:#f9fbfa;border-bottom:1px solid #f0f3f2">
+                    <div style="display:flex;flex-direction:column;gap:1px">
+                      <span style="font-size:13px;color:#47514f">Constructora Vega</span>
+                      <span style="font-family:'JetBrains Mono',monospace;font-size:10px;color:#98a19f">fact. 0412 · 47 días</span>
+                    </div>
+                    <div></div>
+                    <div style="font-family:'JetBrains Mono',monospace;font-size:13px;color:#26302e;text-align:right;font-variant-numeric:tabular-nums">4,200</div>
+                    <div></div>
+                  </div>
+                  <div style="display:grid;grid-template-columns:1fr 62px 132px 62px;gap:14px;align-items:center;padding:6px 20px 6px 41px;background:#f9fbfa;border-bottom:1px solid #f0f3f2">
+                    <div style="display:flex;flex-direction:column;gap:1px">
+                      <span style="font-size:13px;color:#47514f">Grupo Solera</span>
+                      <span style="font-family:'JetBrains Mono',monospace;font-size:10px;color:#98a19f">fact. 0418 · 38 días</span>
+                    </div>
+                    <div></div>
+                    <div style="font-family:'JetBrains Mono',monospace;font-size:13px;color:#26302e;text-align:right;font-variant-numeric:tabular-nums">3,300</div>
+                    <div></div>
+                  </div>
+                  <div style="display:grid;grid-template-columns:1fr 62px 132px 62px;gap:14px;align-items:center;padding:6px 20px 6px 41px;background:#f9fbfa;border-bottom:1px solid #f0f3f2">
+                    <div style="display:flex;flex-direction:column;gap:1px">
+                      <span style="font-size:13px;color:#47514f">Municipalidad de Alajuela</span>
+                      <span style="font-family:'JetBrains Mono',monospace;font-size:10px;color:#98a19f">fact. 0421 · 31 días</span>
+                    </div>
+                    <div></div>
+                    <div style="font-family:'JetBrains Mono',monospace;font-size:13px;color:#26302e;text-align:right;font-variant-numeric:tabular-nums">2,500</div>
+                    <div></div>
+                  </div>
+
+                <sc-for list="{{ activosB }}" as="r" hint-placeholder-count="3">
+                  <div style="display:grid;grid-template-columns:1fr 62px 132px 62px;gap:14px;align-items:center;padding:7px 20px;border-bottom:1px solid #f0f3f2">
+                    <div style="font-size:14px;color:#26302e">{{ r.c }}</div>
+                    <div style="font-family:'JetBrains Mono',monospace;font-size:11px;color:#98a19f">{{ r.p }}</div>
+                    <div style="font-family:'JetBrains Mono',monospace;font-size:14px;color:#0e1413;text-align:right;font-variant-numeric:tabular-nums">{{ r.m }}</div>
+                    <div style="font-family:'JetBrains Mono',monospace;font-size:11px;color:#98a19f;text-align:right">{{ r.v }}</div>
+                  </div>
+                </sc-for>
+                <div style="display:grid;grid-template-columns:1fr 132px;gap:14px;padding:10px 20px;background:#f6f8f7;border-bottom:1px solid #e3e7e6">
+                  <div style="font-size:13px;font-weight:600;color:#0e1413">Total activos</div>
+                  <div style="font-family:'JetBrains Mono',monospace;font-size:14px;font-weight:600;color:#0e1413;text-align:right;font-variant-numeric:tabular-nums">62,200</div>
+                </div>
+                <div style="padding:8px 20px 4px;font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:#6d7876">Pasivos</div>
+                <sc-for list="{{ pasivos }}" as="r" hint-placeholder-count="3">
+                  <div style="display:grid;grid-template-columns:1fr 62px 132px 62px;gap:14px;align-items:center;padding:7px 20px;border-bottom:1px solid #f0f3f2">
+                    <div style="font-size:14px;color:#26302e">{{ r.c }}</div>
+                    <div style="font-family:'JetBrains Mono',monospace;font-size:11px;color:#98a19f">{{ r.p }}</div>
+                    <div style="font-family:'JetBrains Mono',monospace;font-size:14px;color:#0e1413;text-align:right;font-variant-numeric:tabular-nums">{{ r.m }}</div>
+                    <div style="font-family:'JetBrains Mono',monospace;font-size:11px;color:#98a19f;text-align:right">{{ r.v }}</div>
+                  </div>
+                </sc-for>
+                <div style="padding:8px 20px 4px;font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:#6d7876">Patrimonio</div>
+                <sc-for list="{{ patrimonio }}" as="r" hint-placeholder-count="2">
+                  <div style="display:grid;grid-template-columns:1fr 62px 132px 62px;gap:14px;align-items:center;padding:7px 20px;border-bottom:1px solid #f0f3f2">
+                    <div style="font-size:14px;color:#26302e">{{ r.c }}</div>
+                    <div style="font-family:'JetBrains Mono',monospace;font-size:11px;color:#98a19f">{{ r.p }}</div>
+                    <div style="font-family:'JetBrains Mono',monospace;font-size:14px;color:#0e1413;text-align:right;font-variant-numeric:tabular-nums">{{ r.m }}</div>
+                    <div style="font-family:'JetBrains Mono',monospace;font-size:11px;color:#98a19f;text-align:right">{{ r.v }}</div>
+                  </div>
+                </sc-for>
+                <div style="display:grid;grid-template-columns:1fr 132px;gap:14px;padding:10px 20px;background:#f6f8f7">
+                  <div style="font-size:13px;font-weight:600;color:#0e1413">Pasivo + patrimonio</div>
+                  <div style="font-family:'JetBrains Mono',monospace;font-size:14px;font-weight:600;color:#0e1413;text-align:right;font-variant-numeric:tabular-nums">62,200</div>
+                </div>
+              </div>
+
+              <div style="display:flex;flex-direction:column;gap:18px;min-height:0">
+                <div style="display:flex;flex-direction:column;border:1px solid #e3e7e6;border-radius:8px;background:#ffffff;overflow:hidden">
+                  <div style="display:flex;align-items:baseline;justify-content:space-between;padding:14px 20px;border-bottom:1px solid #e3e7e6">
+                    <div style="font-size:15px;font-weight:600;color:#0e1413">Estado de resultados</div>
+                    <div style="font-family:'JetBrains Mono',monospace;font-size:11px;color:#98a19f">ene–jun 2026 · USD</div>
+                  </div>
+                  <sc-for list="{{ resultados }}" as="r" hint-placeholder-count="5">
+                    <div style="display:grid;grid-template-columns:1fr 62px 132px 62px;gap:14px;align-items:center;padding:7px 20px;border-bottom:1px solid #f0f3f2">
+                      <div style="font-size:14px;color:#26302e">{{ r.c }}</div>
+                      <div style="font-family:'JetBrains Mono',monospace;font-size:11px;color:#98a19f">{{ r.p }}</div>
+                      <div style="font-family:'JetBrains Mono',monospace;font-size:14px;color:#0e1413;text-align:right;font-variant-numeric:tabular-nums">{{ r.m }}</div>
+                      <div style="font-family:'JetBrains Mono',monospace;font-size:11px;color:#98a19f;text-align:right">{{ r.v }}</div>
+                    </div>
+                  </sc-for>
+                  <div style="padding:14px 20px 13px;display:flex;flex-direction:column;gap:9px;border-bottom:1px solid #f0f3f2">
+                    <div style="display:flex;align-items:baseline;justify-content:space-between">
+                      <div style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:#98a19f">Composición de cada dólar facturado</div>
+                      <div style="font-family:'JetBrains Mono',monospace;font-size:11px;color:#6d7876">base 214,800</div>
+                    </div>
+                    <div style="display:flex;height:9px;border-radius:9999px;overflow:hidden;background:#f0f3f2">
+                      <div style="width:61.2%;background:#0e1413"></div>
+                      <div style="width:13.5%;background:#6d7876"></div>
+                      <div style="width:2.1%;background:#c3cac8"></div>
+                      <div style="width:23.2%;background:#00b48a"></div>
+                    </div>
+                    <div style="display:flex;gap:16px;flex-wrap:wrap">
+                      <div style="display:flex;align-items:center;gap:6px"><span style="width:7px;height:7px;border-radius:9999px;background:#0e1413"></span><span style="font-size:12px;color:#47514f">Costo de ventas</span><span style="font-family:'JetBrains Mono',monospace;font-size:12px;color:#0e1413">61%</span></div>
+                      <div style="display:flex;align-items:center;gap:6px"><span style="width:7px;height:7px;border-radius:9999px;background:#6d7876"></span><span style="font-size:12px;color:#47514f">Gastos operativos</span><span style="font-family:'JetBrains Mono',monospace;font-size:12px;color:#0e1413">13%</span></div>
+                      <div style="display:flex;align-items:center;gap:6px"><span style="width:7px;height:7px;border-radius:9999px;background:#c3cac8"></span><span style="font-size:12px;color:#47514f">Otros</span><span style="font-family:'JetBrains Mono',monospace;font-size:12px;color:#0e1413">2%</span></div>
+                      <div style="display:flex;align-items:center;gap:6px"><span style="width:7px;height:7px;border-radius:9999px;background:#00b48a"></span><span style="font-size:12px;color:#47514f">Utilidad</span><span style="font-family:'JetBrains Mono',monospace;font-size:12px;color:#0e1413">23%</span></div>
+                    </div>
+                  </div>
+                  <div style="display:grid;grid-template-columns:1fr 132px;gap:14px;padding:12px 20px;background:#f6f8f7">
+                    <div style="font-size:13px;font-weight:600;color:#0e1413">Utilidad neta</div>
+                    <div style="font-family:'JetBrains Mono',monospace;font-size:16px;font-weight:600;color:#0e1413;text-align:right;font-variant-numeric:tabular-nums">50,000</div>
+                  </div>
+                </div>
+
+                <div style="border:1px solid #e3e7e6;border-radius:8px;background:#ffffff;padding:18px 20px;display:flex;flex-direction:column;gap:10px">
+                  <div style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:#98a19f">Lo que el board mirará primero</div>
+                  <div style="font-size:14px;line-height:1.55;color:#26302e;text-wrap:pretty">La utilidad del periodo es <span style="font-family:'JetBrains Mono',monospace">50,000</span> y el banco cierra en <span style="font-family:'JetBrains Mono',monospace">3,000</span>. Confirma estos dos renglones con cuidado: la primera lectura se construye sobre esa distancia.</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div style="display:flex;align-items:center;justify-content:space-between;padding:18px 40px;border-top:1px solid #e3e7e6;background:rgba(255,255,255,.7)">
+            <div style="font-size:13px;color:#6d7876">18 renglones extraídos · ninguno editado</div>
+            <div style="display:flex;align-items:center;gap:10px">
+              <button style="border:none;background:transparent;font-family:'Instrument Sans',sans-serif;font-size:14px;color:#6d7876;padding:10px 14px;cursor:pointer">Rechazar extracción</button>
+              <button style="background:transparent;border:1px solid #cfd6d4;border-radius:9999px;font-family:'Instrument Sans',sans-serif;font-size:14px;font-weight:500;color:#0e1413;padding:10px 20px;cursor:pointer">Corregir</button>
+              <button style="background:#0e1413;border:none;border-radius:9999px;font-family:'Instrument Sans',sans-serif;font-size:14px;font-weight:500;color:#ffffff;padding:11px 24px;cursor:pointer">Confirmar cifras</button>
+            </div>
+          </div>
+        <div style="padding:12px 40px 14px;border-top:1px solid #e3e7e6;background:rgba(255,255,255,.7)">
+            <div style="display:flex;align-items:center;gap:12px;height:44px;background:#ffffff;border:1px solid #cfd6d4;border-radius:9999px;padding:0 6px 0 12px">
+              <button title="Adjuntar archivo" style="width:24px;height:24px;flex:none;border:1px solid #cfd6d4;border-radius:9999px;background:transparent;color:#47514f;font-family:'Instrument Sans',sans-serif;font-size:16px;line-height:1;display:flex;align-items:center;justify-content:center;padding:0 0 1px;cursor:pointer">+</button>
+              <div style="flex:1;font-size:14px;color:#98a19f">Pregúntale al Asesor Financiero…</div>
+              <button style="background:#0e1413;border:none;border-radius:9999px;font-family:'Instrument Sans',sans-serif;font-size:13px;font-weight:500;color:#ffffff;padding:8px 20px;cursor:pointer;flex:none">Enviar</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── 1a DARK ────────────────────────────────────────── -->
+      <div style="width:1440px;height:970px;overflow:hidden;background:radial-gradient(1100px 700px at 12% -10%,#12211e 0%,#0a0d0d 62%);border:1px solid #1e2624;border-radius:6px;display:flex;box-shadow:0 24px 48px -20px rgba(0,0,0,.5)">
+        <div style="width:260px;flex:none;border-right:1px solid #1e2624;background:rgba(255,255,255,.02);display:flex;flex-direction:column;padding:26px 18px 22px">
+        <div style="display:flex;align-items:center;gap:10px;padding:0 8px 24px">
+          <div style="width:11px;height:11px;background:#3ddfb4"></div>
+          <div style="font-family:'Instrument Serif',serif;font-size:19px;letter-spacing:-.2px;color:#e9eeec">Board of Advisors</div>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px;padding:0 8px 10px">
+            <span style="width:14px;height:14px;flex:none;border:1px solid #2a3432;display:flex;align-items:center;justify-content:center;font-family:'Instrument Sans',sans-serif;font-size:12px;line-height:1;color:#5f6a67;padding-bottom:1px">+</span>
+            <span style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:#5f6a67">Create new advisor</span>
+          </div>
+        <div style="background:#101514;border:1px solid #1e2624;border-radius:8px;padding:12px 12px 8px;display:flex;flex-direction:column">
+          <div style="display:flex;align-items:center;justify-content:space-between;padding:0 2px 6px">
+            <span style="font-size:14px;font-weight:600;color:#e9eeec">Financial Advisor</span>
+            <span style="font-family:'JetBrains Mono',monospace;font-size:11px;color:#3ddfb4">3</span>
+          </div>
+          <div style="margin-left:5px;border-left:1px solid #2a3432;display:flex;flex-direction:column">
+            <div style="display:flex;align-items:center;padding:5px 0"><span style="width:13px;height:1px;background:#2a3432;flex:none;margin-right:8px"></span><span style="font-size:12px;font-weight:500;color:#cbd4d1">Where is the money</span></div>
+            <div style="margin-left:21px;border-left:1px solid #2a3432;display:flex;flex-direction:column">
+              <div style="display:flex;align-items:center;padding:5px 0"><span style="width:13px;height:1px;background:#2a3432;flex:none;margin-right:8px"></span><span style="font-size:12px;font-weight:500;color:#cbd4d1">Request 1 - 02/12/2026</span></div>
+            </div>
+            <div style="display:flex;align-items:center;padding:5px 0"><span style="width:13px;height:1px;background:#2a3432;flex:none;margin-right:8px"></span><span style="font-size:12px;font-style:italic;color:#cbd4d1">Plan savings for project A</span></div>
+            <div style="display:flex;align-items:center;padding:5px 0"><span style="width:13px;height:1px;background:#2a3432;flex:none;margin-right:8px"></span><span style="font-size:12px;font-style:italic;color:#cbd4d1">Create a cashflow projection</span></div>
+          </div>
+          <div style="display:flex;flex-direction:column;padding-top:8px">
+            <div style="display:flex;align-items:center;padding:6px 2px"><span style="font-size:14px;color:#b9c3c0">Marketing Advisor</span></div>
+            <div style="display:flex;align-items:center;padding:6px 2px"><span style="font-size:14px;color:#b9c3c0">Sales Advisor</span></div>
+            <div style="display:flex;align-items:center;padding:6px 2px"><span style="font-size:14px;color:#b9c3c0">Operations Advisor</span></div>
+          </div>
+        </div>
+        <div style="padding-top:30px"><div style="display:flex;align-items:center;gap:8px;padding:0 8px 10px">
+            <span style="width:14px;height:14px;flex:none;border:1px solid #2a3432;display:flex;align-items:center;justify-content:center;font-family:'Instrument Sans',sans-serif;font-size:12px;line-height:1;color:#5f6a67;padding-bottom:1px">+</span>
+            <span style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:#5f6a67">Create new section</span>
+          </div></div>
+          <div style="display:flex;flex-direction:column;gap:2px">
+          <div style="display:flex;align-items:center;justify-content:space-between;padding:9px 10px;border-radius:6px">
+            <span style="font-size:14px;color:#b9c3c0">Perfil Empresarial</span>
+          </div>
+          <div style="display:flex;align-items:center;justify-content:space-between;padding:9px 10px;border-radius:6px">
+            <span style="font-size:14px;color:#b9c3c0">Sales Advisor</span><span style="width:18px;height:18px;flex:none;border-radius:9999px;background:#ff005f;display:flex;align-items:center;justify-content:center;font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:600;color:#ffffff;line-height:1;padding-left:.5px">2</span>
+          </div>
+          <div style="display:flex;align-items:center;justify-content:space-between;padding:9px 10px;border-radius:6px">
+            <span style="font-size:14px;color:#b9c3c0">Operations Advisor</span><span style="font-family:'JetBrains Mono',monospace;font-size:11px;color:#7f8a87;width:18px;flex:none;display:flex;justify-content:center">3</span>
+          </div>
+          <div style="display:flex;align-items:center;justify-content:space-between;padding:9px 10px;border-radius:6px">
+            <span style="font-size:14px;color:#b9c3c0">Compromisos</span><span style="font-family:'JetBrains Mono',monospace;font-size:11px;color:#e07a70">1 vencido</span>
+          </div>
+          <div style="display:flex;align-items:center;justify-content:space-between;padding:9px 10px;border-radius:6px">
+            <span style="font-size:14px;color:#b9c3c0">Documentos</span><span style="font-family:'JetBrains Mono',monospace;font-size:11px;color:#7f8a87;width:18px;flex:none;display:flex;justify-content:center">50</span>
+          </div>
+        </div>
+        <div style="flex:1"></div>
+        <div style="border-top:1px solid #1e2624;padding:16px 10px 0;display:flex;flex-direction:column;gap:5px">
+          <div style="font-size:13px;font-weight:500;color:#e9eeec">Siscon S.R.L.</div>
+          <div style="font-size:12px;color:#5f6a67">Abraham · Goldgewicht - Gerente</div>
+        </div>
+      </div>
+
+      <div style="flex:1;display:flex;flex-direction:column;min-width:0">
+          <div style="display:flex;align-items:flex-end;justify-content:space-between;padding:34px 40px 22px;border-bottom:1px solid #1e2624">
+            <div style="display:flex;flex-direction:column;gap:8px">
+              <div style="font-family:'Instrument Serif',serif;font-size:34px;line-height:1.1;color:#e9eeec">Confirma lo que leí de tus estados</div>
+              <div style="font-size:14px;line-height:1.5;color:#b9c3c0;max-width:520px">Sin cifras confirmadas el board no da consejo. Revisa cada renglón, corrige lo que esté mal.</div>
+            </div>
+            <div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px;padding-bottom:4px">
+              <div style="font-family:'JetBrains Mono',monospace;font-size:12px;color:#e9eeec">estados_2026_jun.pdf</div>
+              <div style="font-family:'JetBrains Mono',monospace;font-size:11px;color:#5f6a67">7 páginas · extraído hoy 09:14</div>
+            </div>
+          </div>
+
+          <div style="flex:1;overflow:hidden;padding:20px 40px 0;display:flex;flex-direction:column;gap:18px">
+            <sc-if value="{{ balanceOk }}" hint-placeholder-val="{{ true }}">
+              <div style="display:flex;align-items:center;gap:14px;padding:13px 18px;border:1px solid #1d4a3f;background:rgba(61,223,180,.07);border-radius:8px;animation:riseIn .5s ease both">
+                <div style="width:8px;height:8px;border-radius:9999px;background:#3ddfb4"></div>
+                <div style="font-size:14px;font-weight:500;color:#e9eeec">La aritmética cuadra</div>
+                <div style="font-family:'JetBrains Mono',monospace;font-size:13px;color:#3ddfb4">activos 62,200 = pasivo 26,600 + patrimonio 35,600</div>
+              </div>
+            </sc-if>
+            <sc-if value="{{ balanceError }}" hint-placeholder-val="{{ false }}">
+              <div style="display:flex;align-items:center;gap:14px;padding:13px 18px;border:1px solid #5a2b26;background:rgba(224,122,112,.08);border-radius:8px">
+                <div style="width:8px;height:8px;border-radius:9999px;background:#e07a70"></div>
+                <div style="font-size:14px;font-weight:500;color:#e9eeec">Los totales no cuadran por 1,400</div>
+                <div style="font-family:'JetBrains Mono',monospace;font-size:13px;color:#e07a70">activos 62,200 ≠ pasivo 26,600 + patrimonio 34,200</div>
+              </div>
+            </sc-if>
+
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:28px;min-height:0">
+              <div style="display:flex;flex-direction:column;border:1px solid #1e2624;border-radius:8px;background:#101514;overflow-y:auto">
+                <div style="display:flex;align-items:baseline;justify-content:space-between;padding:14px 20px;border-bottom:1px solid #1e2624">
+                  <div style="font-size:15px;font-weight:600;color:#e9eeec">Balance general</div>
+                  <div style="font-family:'JetBrains Mono',monospace;font-size:11px;color:#5f6a67">al 30 jun 2026 · USD</div>
+                </div>
+                <div style="display:grid;grid-template-columns:1fr 62px 132px 62px;gap:14px;padding:8px 20px;border-bottom:1px solid #1e2624;font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:#5f6a67">
+                  <div>Cuenta</div><div>Pág.</div><div style="text-align:right">Monto</div><div style="text-align:right">Conf.</div>
+                </div>
+                <div style="padding:6px 20px 4px;font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:#7f8a87">Activos</div>
+                <sc-for list="{{ activosA }}" as="r" hint-placeholder-count="1">
+                  <div style="display:grid;grid-template-columns:1fr 62px 132px 62px;gap:14px;align-items:center;padding:7px 20px;border-bottom:1px solid #171d1c">
+                    <div style="font-size:14px;color:#cbd4d1">{{ r.c }}</div>
+                    <div style="font-family:'JetBrains Mono',monospace;font-size:11px;color:#5f6a67">{{ r.p }}</div>
+                    <div style="font-family:'JetBrains Mono',monospace;font-size:14px;color:#e9eeec;text-align:right;font-variant-numeric:tabular-nums">{{ r.m }}</div>
+                    <div style="font-family:'JetBrains Mono',monospace;font-size:11px;color:#5f6a67;text-align:right">{{ r.v }}</div>
+                  </div>
+                </sc-for>
+                <div style="display:grid;grid-template-columns:1fr 62px 132px 62px;gap:14px;align-items:center;padding:7px 20px;border-bottom:1px solid #171d1c;background:#151b1a">
+                    <div style="display:flex;align-items:center;gap:7px">
+                      <span style="font-family:'JetBrains Mono',monospace;font-size:9px;color:#3ddfb4;line-height:1">▼</span>
+                      <span style="font-size:14px;font-weight:500;color:#e9eeec">Cuentas por cobrar</span>
+                      <span style="font-family:'JetBrains Mono',monospace;font-size:10px;color:#5f6a67">3 facturas</span>
+                    </div>
+                    <div style="font-family:'JetBrains Mono',monospace;font-size:11px;color:#5f6a67">p.2</div>
+                    <div style="font-family:'JetBrains Mono',monospace;font-size:14px;color:#e9eeec;text-align:right;font-variant-numeric:tabular-nums">10,000</div>
+                    <div style="font-family:'JetBrains Mono',monospace;font-size:11px;color:#5f6a67;text-align:right">99%</div>
+                  </div>
+                  <div style="display:grid;grid-template-columns:1fr 62px 132px 62px;gap:14px;align-items:center;padding:6px 20px 6px 41px;background:#121817;border-bottom:1px solid #171d1c">
+                    <div style="display:flex;flex-direction:column;gap:1px">
+                      <span style="font-size:13px;color:#b9c3c0">Constructora Vega</span>
+                      <span style="font-family:'JetBrains Mono',monospace;font-size:10px;color:#5f6a67">fact. 0412 · 47 días</span>
+                    </div>
+                    <div></div>
+                    <div style="font-family:'JetBrains Mono',monospace;font-size:13px;color:#cbd4d1;text-align:right;font-variant-numeric:tabular-nums">4,200</div>
+                    <div></div>
+                  </div>
+                  <div style="display:grid;grid-template-columns:1fr 62px 132px 62px;gap:14px;align-items:center;padding:6px 20px 6px 41px;background:#121817;border-bottom:1px solid #171d1c">
+                    <div style="display:flex;flex-direction:column;gap:1px">
+                      <span style="font-size:13px;color:#b9c3c0">Grupo Solera</span>
+                      <span style="font-family:'JetBrains Mono',monospace;font-size:10px;color:#5f6a67">fact. 0418 · 38 días</span>
+                    </div>
+                    <div></div>
+                    <div style="font-family:'JetBrains Mono',monospace;font-size:13px;color:#cbd4d1;text-align:right;font-variant-numeric:tabular-nums">3,300</div>
+                    <div></div>
+                  </div>
+                  <div style="display:grid;grid-template-columns:1fr 62px 132px 62px;gap:14px;align-items:center;padding:6px 20px 6px 41px;background:#121817;border-bottom:1px solid #171d1c">
+                    <div style="display:flex;flex-direction:column;gap:1px">
+                      <span style="font-size:13px;color:#b9c3c0">Municipalidad de Alajuela</span>
+                      <span style="font-family:'JetBrains Mono',monospace;font-size:10px;color:#5f6a67">fact. 0421 · 31 días</span>
+                    </div>
+                    <div></div>
+                    <div style="font-family:'JetBrains Mono',monospace;font-size:13px;color:#cbd4d1;text-align:right;font-variant-numeric:tabular-nums">2,500</div>
+                    <div></div>
+                  </div>
+
+                <sc-for list="{{ activosB }}" as="r" hint-placeholder-count="3">
+                  <div style="display:grid;grid-template-columns:1fr 62px 132px 62px;gap:14px;align-items:center;padding:7px 20px;border-bottom:1px solid #171d1c">
+                    <div style="font-size:14px;color:#cbd4d1">{{ r.c }}</div>
+                    <div style="font-family:'JetBrains Mono',monospace;font-size:11px;color:#5f6a67">{{ r.p }}</div>
+                    <div style="font-family:'JetBrains Mono',monospace;font-size:14px;color:#e9eeec;text-align:right;font-variant-numeric:tabular-nums">{{ r.m }}</div>
+                    <div style="font-family:'JetBrains Mono',monospace;font-size:11px;color:#5f6a67;text-align:right">{{ r.v }}</div>
+                  </div>
+                </sc-for>
+                <div style="display:grid;grid-template-columns:1fr 132px;gap:14px;padding:10px 20px;background:#151b1a;border-bottom:1px solid #1e2624">
+                  <div style="font-size:13px;font-weight:600;color:#e9eeec">Total activos</div>
+                  <div style="font-family:'JetBrains Mono',monospace;font-size:14px;font-weight:600;color:#e9eeec;text-align:right;font-variant-numeric:tabular-nums">62,200</div>
+                </div>
+                <div style="padding:8px 20px 4px;font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:#7f8a87">Pasivos</div>
+                <sc-for list="{{ pasivos }}" as="r" hint-placeholder-count="3">
+                  <div style="display:grid;grid-template-columns:1fr 62px 132px 62px;gap:14px;align-items:center;padding:7px 20px;border-bottom:1px solid #171d1c">
+                    <div style="font-size:14px;color:#cbd4d1">{{ r.c }}</div>
+                    <div style="font-family:'JetBrains Mono',monospace;font-size:11px;color:#5f6a67">{{ r.p }}</div>
+                    <div style="font-family:'JetBrains Mono',monospace;font-size:14px;color:#e9eeec;text-align:right;font-variant-numeric:tabular-nums">{{ r.m }}</div>
+                    <div style="font-family:'JetBrains Mono',monospace;font-size:11px;color:#5f6a67;text-align:right">{{ r.v }}</div>
+                  </div>
+                </sc-for>
+                <div style="padding:8px 20px 4px;font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:#7f8a87">Patrimonio</div>
+                <sc-for list="{{ patrimonio }}" as="r" hint-placeholder-count="2">
+                  <div style="display:grid;grid-template-columns:1fr 62px 132px 62px;gap:14px;align-items:center;padding:7px 20px;border-bottom:1px solid #171d1c">
+                    <div style="font-size:14px;color:#cbd4d1">{{ r.c }}</div>
+                    <div style="font-family:'JetBrains Mono',monospace;font-size:11px;color:#5f6a67">{{ r.p }}</div>
+                    <div style="font-family:'JetBrains Mono',monospace;font-size:14px;color:#e9eeec;text-align:right;font-variant-numeric:tabular-nums">{{ r.m }}</div>
+                    <div style="font-family:'JetBrains Mono',monospace;font-size:11px;color:#5f6a67;text-align:right">{{ r.v }}</div>
+                  </div>
+                </sc-for>
+                <div style="display:grid;grid-template-columns:1fr 132px;gap:14px;padding:10px 20px;background:#151b1a">
+                  <div style="font-size:13px;font-weight:600;color:#e9eeec">Pasivo + patrimonio</div>
+                  <div style="font-family:'JetBrains Mono',monospace;font-size:14px;font-weight:600;color:#e9eeec;text-align:right;font-variant-numeric:tabular-nums">62,200</div>
+                </div>
+              </div>
+
+              <div style="display:flex;flex-direction:column;gap:18px;min-height:0">
+                <div style="display:flex;flex-direction:column;border:1px solid #1e2624;border-radius:8px;background:#101514;overflow:hidden">
+                  <div style="display:flex;align-items:baseline;justify-content:space-between;padding:14px 20px;border-bottom:1px solid #1e2624">
+                    <div style="font-size:15px;font-weight:600;color:#e9eeec">Estado de resultados</div>
+                    <div style="font-family:'JetBrains Mono',monospace;font-size:11px;color:#5f6a67">ene–jun 2026 · USD</div>
+                  </div>
+                  <sc-for list="{{ resultados }}" as="r" hint-placeholder-count="5">
+                    <div style="display:grid;grid-template-columns:1fr 62px 132px 62px;gap:14px;align-items:center;padding:7px 20px;border-bottom:1px solid #171d1c">
+                      <div style="font-size:14px;color:#cbd4d1">{{ r.c }}</div>
+                      <div style="font-family:'JetBrains Mono',monospace;font-size:11px;color:#5f6a67">{{ r.p }}</div>
+                      <div style="font-family:'JetBrains Mono',monospace;font-size:14px;color:#e9eeec;text-align:right;font-variant-numeric:tabular-nums">{{ r.m }}</div>
+                      <div style="font-family:'JetBrains Mono',monospace;font-size:11px;color:#5f6a67;text-align:right">{{ r.v }}</div>
+                    </div>
+                  </sc-for>
+                  <div style="padding:14px 20px 13px;display:flex;flex-direction:column;gap:9px;border-bottom:1px solid #171d1c">
+                    <div style="display:flex;align-items:baseline;justify-content:space-between">
+                      <div style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:#5f6a67">Composición de cada dólar facturado</div>
+                      <div style="font-family:'JetBrains Mono',monospace;font-size:11px;color:#7f8a87">base 214,800</div>
+                    </div>
+                    <div style="display:flex;height:9px;border-radius:9999px;overflow:hidden;background:#1a201f">
+                      <div style="width:61.2%;background:#cbd4d1"></div>
+                      <div style="width:13.5%;background:#6f7a77"></div>
+                      <div style="width:2.1%;background:#3a4543"></div>
+                      <div style="width:23.2%;background:#3ddfb4"></div>
+                    </div>
+                    <div style="display:flex;gap:16px;flex-wrap:wrap">
+                      <div style="display:flex;align-items:center;gap:6px"><span style="width:7px;height:7px;border-radius:9999px;background:#cbd4d1"></span><span style="font-size:12px;color:#b9c3c0">Costo de ventas</span><span style="font-family:'JetBrains Mono',monospace;font-size:12px;color:#e9eeec">61%</span></div>
+                      <div style="display:flex;align-items:center;gap:6px"><span style="width:7px;height:7px;border-radius:9999px;background:#6f7a77"></span><span style="font-size:12px;color:#b9c3c0">Gastos operativos</span><span style="font-family:'JetBrains Mono',monospace;font-size:12px;color:#e9eeec">13%</span></div>
+                      <div style="display:flex;align-items:center;gap:6px"><span style="width:7px;height:7px;border-radius:9999px;background:#3a4543"></span><span style="font-size:12px;color:#b9c3c0">Otros</span><span style="font-family:'JetBrains Mono',monospace;font-size:12px;color:#e9eeec">2%</span></div>
+                      <div style="display:flex;align-items:center;gap:6px"><span style="width:7px;height:7px;border-radius:9999px;background:#3ddfb4"></span><span style="font-size:12px;color:#b9c3c0">Utilidad</span><span style="font-family:'JetBrains Mono',monospace;font-size:12px;color:#e9eeec">23%</span></div>
+                    </div>
+                  </div>
+                  <div style="display:grid;grid-template-columns:1fr 132px;gap:14px;padding:12px 20px;background:#151b1a">
+                    <div style="font-size:13px;font-weight:600;color:#e9eeec">Utilidad neta</div>
+                    <div style="font-family:'JetBrains Mono',monospace;font-size:16px;font-weight:600;color:#e9eeec;text-align:right;font-variant-numeric:tabular-nums">50,000</div>
+                  </div>
+                </div>
+
+                <div style="border:1px solid #1e2624;border-radius:8px;background:#101514;padding:18px 20px;display:flex;flex-direction:column;gap:10px">
+                  <div style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:#5f6a67">Lo que el board mirará primero</div>
+                  <div style="font-size:14px;line-height:1.55;color:#cbd4d1;text-wrap:pretty">La utilidad del periodo es <span style="font-family:'JetBrains Mono',monospace">50,000</span> y el banco cierra en <span style="font-family:'JetBrains Mono',monospace">3,000</span>. Confirma estos dos renglones con cuidado: la primera lectura se construye sobre esa distancia.</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div style="display:flex;align-items:center;justify-content:space-between;padding:18px 40px;border-top:1px solid #1e2624;background:rgba(255,255,255,.02)">
+            <div style="font-size:13px;color:#7f8a87">18 renglones extraídos · ninguno editado</div>
+            <div style="display:flex;align-items:center;gap:10px">
+              <button style="border:none;background:transparent;font-family:'Instrument Sans',sans-serif;font-size:14px;color:#7f8a87;padding:10px 14px;cursor:pointer">Rechazar extracción</button>
+              <button style="background:transparent;border:1px solid #2a3432;border-radius:9999px;font-family:'Instrument Sans',sans-serif;font-size:14px;font-weight:500;color:#e9eeec;padding:10px 20px;cursor:pointer">Corregir</button>
+              <button style="background:#e9eeec;border:none;border-radius:9999px;font-family:'Instrument Sans',sans-serif;font-size:14px;font-weight:500;color:#0a0d0d;padding:11px 24px;cursor:pointer">Confirmar cifras</button>
+            </div>
+          </div>
+        <div style="padding:12px 40px 14px;border-top:1px solid #1e2624;background:rgba(255,255,255,.02)">
+            <div style="display:flex;align-items:center;gap:12px;height:44px;background:#101514;border:1px solid #2a3432;border-radius:9999px;padding:0 6px 0 12px">
+              <button title="Adjuntar archivo" style="width:24px;height:24px;flex:none;border:1px solid #2a3432;border-radius:9999px;background:transparent;color:#b9c3c0;font-family:'Instrument Sans',sans-serif;font-size:16px;line-height:1;display:flex;align-items:center;justify-content:center;padding:0 0 1px;cursor:pointer">+</button>
+              <div style="flex:1;font-size:14px;color:#5f6a67">Pregúntale al Asesor Financiero…</div>
+              <button style="background:#e9eeec;border:none;border-radius:9999px;font-family:'Instrument Sans',sans-serif;font-size:13px;font-weight:500;color:#0a0d0d;padding:8px 20px;cursor:pointer;flex:none">Enviar</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="1b" style="display:flex;flex-direction:column;gap:18px">
+      <div style="display:flex;align-items:baseline;gap:12px">
+        <div style="font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:600;color:#0e1413;background:#ffffff;border:1px solid #cfd6d4;border-radius:9999px;padding:4px 12px">1b</div>
+        <div style="font-size:15px;font-weight:600;color:#0e1413">Cotejo contra el PDF</div>
+        <div style="font-size:14px;color:#6d7876">Sin navegación · el origen y la lectura, lado a lado</div>
+      </div>
+
+      <!-- ── 1b LIGHT ───────────────────────────────────────── -->
+      <div style="width:1440px;height:970px;overflow:hidden;background:linear-gradient(168deg,#eef2f1 0%,#f8faf9 46%,#eef2f1 100%);border:1px solid #cfd6d4;border-radius:6px;display:flex;flex-direction:column;box-shadow:0 24px 48px -20px rgba(14,20,19,.22)">
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:20px 36px;border-bottom:1px solid #e3e7e6">
+          <div style="display:flex;align-items:center;gap:10px">
+            <div style="width:11px;height:11px;background:#00806a"></div>
+            <div style="font-family:'Instrument Serif',serif;font-size:19px;letter-spacing:-.2px;color:#0e1413">Board of Advisors</div>
+          </div>
+          <div style="display:flex;align-items:center;gap:10px">
+            <div style="font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:#98a19f">Paso 1 de 2</div>
+            <div style="width:120px;height:3px;background:#e3e7e6;border-radius:9999px;overflow:hidden"><div style="width:50%;height:100%;background:#00806a"></div></div>
+          </div>
+        </div>
+
+        <div style="flex:1;display:flex;min-height:0">
+          <div style="width:600px;flex:none;border-right:1px solid #e3e7e6;display:flex;flex-direction:column;background:rgba(255,255,255,.4)">
+            <div style="display:flex;align-items:center;justify-content:space-between;padding:16px 28px;border-bottom:1px solid #e3e7e6">
+              <div style="font-family:'JetBrains Mono',monospace;font-size:12px;color:#0e1413">estados_2026_jun.pdf</div>
+              <div style="display:flex;align-items:center;gap:8px;font-family:'JetBrains Mono',monospace;font-size:11px;color:#98a19f">
+                <span>pág. 2 / 7</span>
+                <span style="width:1px;height:12px;background:#cfd6d4"></span>
+                <span>original</span>
+              </div>
+            </div>
+            <div style="flex:1;display:flex;gap:16px;padding:22px 28px;min-height:0">
+              <div style="width:56px;flex:none;display:flex;flex-direction:column;gap:8px">
+                <div style="height:72px;border:2px solid #00806a;border-radius:3px;background:repeating-linear-gradient(180deg,#e8ecec 0 3px,#f6f8f7 3px 7px)"></div>
+                <div style="height:72px;border:1px solid #dfe4e3;border-radius:3px;background:repeating-linear-gradient(180deg,#eceff0 0 3px,#f8faf9 3px 7px)"></div>
+                <div style="height:72px;border:1px solid #dfe4e3;border-radius:3px;background:repeating-linear-gradient(180deg,#eceff0 0 3px,#f8faf9 3px 7px)"></div>
+                <div style="height:72px;border:1px solid #dfe4e3;border-radius:3px;background:repeating-linear-gradient(180deg,#eceff0 0 3px,#f8faf9 3px 7px)"></div>
+              </div>
+              <div style="flex:1;border:1px solid #dfe4e3;background:#ffffff;border-radius:3px;position:relative;display:flex;flex-direction:column;justify-content:center;align-items:center;gap:14px;background-image:repeating-linear-gradient(180deg,#f1f4f3 0 6px,#ffffff 6px 15px)">
+                <div style="position:absolute;left:0;right:0;top:186px;height:34px;background:rgba(0,180,138,.12);border-top:1px solid rgba(0,128,106,.45);border-bottom:1px solid rgba(0,128,106,.45)"></div>
+                <div style="font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:#98a19f;background:#ffffff;padding:6px 10px">vista del pdf original</div>
+              </div>
+            </div>
+            <div style="padding:14px 28px 22px">
+              <div style="display:flex;align-items:center;gap:10px;font-size:13px;color:#47514f;line-height:1.5">
+                <span style="width:20px;height:12px;background:rgba(0,180,138,.2);border:1px solid rgba(0,128,106,.45);flex:none"></span>
+                El renglón resaltado es el que estás revisando a la derecha.
+              </div>
+            </div>
+          </div>
+
+          <div style="flex:1;display:flex;flex-direction:column;min-width:0">
+            <div style="padding:28px 36px 0;display:flex;flex-direction:column;gap:14px">
+              <div style="font-family:'Instrument Serif',serif;font-size:32px;line-height:1.12;color:#0e1413;max-width:520px">Esto fue lo que leí. ¿Está bien?</div>
+              <sc-if value="{{ balanceOk }}" hint-placeholder-val="{{ true }}">
+                <div style="display:flex;align-items:center;gap:12px;padding:12px 16px;border:1px solid #b8e3d5;background:#effaf6;border-radius:8px;animation:riseIn .5s ease both">
+                  <div style="width:8px;height:8px;border-radius:9999px;background:#00b48a"></div>
+                  <div style="font-size:14px;font-weight:500;color:#0e1413">Cuadra: 62,200 = 26,600 + 35,600</div>
+                </div>
+              </sc-if>
+              <sc-if value="{{ balanceError }}" hint-placeholder-val="{{ false }}">
+                <div style="display:flex;align-items:center;gap:12px;padding:12px 16px;border:1px solid #eec3bf;background:#fdf2f1;border-radius:8px">
+                  <div style="width:8px;height:8px;border-radius:9999px;background:#c0483f"></div>
+                  <div style="font-size:14px;font-weight:500;color:#0e1413">Descuadre de 1,400 en el balance</div>
+                </div>
+              </sc-if>
+              <div style="display:flex;gap:22px;border-bottom:1px solid #e3e7e6">
+                <div style="padding:10px 0;border-bottom:2px solid #0e1413;font-size:14px;font-weight:500;color:#0e1413">Balance general</div>
+                <div style="padding:10px 0;border-bottom:2px solid transparent;font-size:14px;color:#6d7876">Estado de resultados</div>
+                <div style="padding:10px 0;border-bottom:2px solid transparent;font-size:14px;color:#6d7876">Notas</div>
+              </div>
+            </div>
+
+            <div style="flex:1;overflow:hidden;padding:6px 36px 0;display:flex;flex-direction:column">
+              <div style="padding:12px 4px 6px;font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:#6d7876">Activos · USD</div>
+              <sc-for list="{{ activos }}" as="r" hint-placeholder-count="5">
+                <div style="display:grid;grid-template-columns:1fr 150px 96px;gap:16px;align-items:center;padding:11px 4px;border-bottom:1px solid #e8ecec">
+                  <div style="display:flex;flex-direction:column;gap:2px">
+                    <div style="font-size:15px;color:#0e1413">{{ r.c }}</div>
+                    <div style="font-family:'JetBrains Mono',monospace;font-size:11px;color:#98a19f">{{ r.p }} · confianza {{ r.v }}</div>
+                  </div>
+                  <div style="font-family:'JetBrains Mono',monospace;font-size:16px;color:#0e1413;text-align:right;font-variant-numeric:tabular-nums">{{ r.m }}</div>
+                  <div style="text-align:right;font-size:13px;color:#00806a">Editar</div>
+                </div>
+              </sc-for>
+              <div style="display:grid;grid-template-columns:1fr 150px 96px;gap:16px;align-items:center;padding:14px 4px;border-top:1px solid #cfd6d4">
+                <div style="font-size:14px;font-weight:600;color:#0e1413">Total activos</div>
+                <div style="font-family:'JetBrains Mono',monospace;font-size:18px;font-weight:600;color:#0e1413;text-align:right;font-variant-numeric:tabular-nums">62,200</div>
+                <div></div>
+              </div>
+              <div style="display:grid;grid-template-columns:1fr 150px 96px;gap:16px;align-items:center;padding:6px 4px">
+                <div style="font-size:14px;color:#47514f">Pasivo + patrimonio</div>
+                <div style="font-family:'JetBrains Mono',monospace;font-size:16px;color:#47514f;text-align:right;font-variant-numeric:tabular-nums">62,200</div>
+                <div></div>
+              </div>
+            </div>
+
+            <div style="display:flex;align-items:center;justify-content:space-between;padding:18px 36px;border-top:1px solid #e3e7e6;background:rgba(255,255,255,.7)">
+              <button style="border:none;background:transparent;font-family:'Instrument Sans',sans-serif;font-size:14px;color:#6d7876;padding:10px 0;cursor:pointer">Rechazar y subir otro PDF</button>
+              <div style="display:flex;align-items:center;gap:10px">
+                <button style="background:transparent;border:1px solid #cfd6d4;border-radius:9999px;font-family:'Instrument Sans',sans-serif;font-size:14px;font-weight:500;color:#0e1413;padding:10px 20px;cursor:pointer">Corregir</button>
+                <button style="background:#0e1413;border:none;border-radius:9999px;font-family:'Instrument Sans',sans-serif;font-size:14px;font-weight:500;color:#ffffff;padding:11px 24px;cursor:pointer">Confirmar y pedir primera lectura</button>
+              </div>
+            </div>
+          </div>
+        <div style="padding:12px 40px 14px;border-top:1px solid #e3e7e6;background:rgba(255,255,255,.7)">
+            <div style="display:flex;align-items:center;gap:12px;height:44px;background:#ffffff;border:1px solid #cfd6d4;border-radius:9999px;padding:0 6px 0 12px">
+              <button title="Adjuntar archivo" style="width:24px;height:24px;flex:none;border:1px solid #cfd6d4;border-radius:9999px;background:transparent;color:#47514f;font-family:'Instrument Sans',sans-serif;font-size:16px;line-height:1;display:flex;align-items:center;justify-content:center;padding:0 0 1px;cursor:pointer">+</button>
+              <div style="flex:1;font-size:14px;color:#98a19f">Pregúntale al Asesor Financiero…</div>
+              <button style="background:#0e1413;border:none;border-radius:9999px;font-family:'Instrument Sans',sans-serif;font-size:13px;font-weight:500;color:#ffffff;padding:8px 20px;cursor:pointer;flex:none">Enviar</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── 1b DARK ────────────────────────────────────────── -->
+      <div style="width:1440px;height:970px;overflow:hidden;background:radial-gradient(1100px 700px at 78% -12%,#12211e 0%,#0a0d0d 60%);border:1px solid #1e2624;border-radius:6px;display:flex;flex-direction:column;box-shadow:0 24px 48px -20px rgba(0,0,0,.5)">
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:20px 36px;border-bottom:1px solid #1e2624">
+          <div style="display:flex;align-items:center;gap:10px">
+            <div style="width:11px;height:11px;background:#3ddfb4"></div>
+            <div style="font-family:'Instrument Serif',serif;font-size:19px;letter-spacing:-.2px;color:#e9eeec">Board of Advisors</div>
+          </div>
+          <div style="display:flex;align-items:center;gap:10px">
+            <div style="font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:#5f6a67">Paso 1 de 2</div>
+            <div style="width:120px;height:3px;background:#1e2624;border-radius:9999px;overflow:hidden"><div style="width:50%;height:100%;background:#3ddfb4"></div></div>
+          </div>
+        </div>
+
+        <div style="flex:1;display:flex;min-height:0">
+          <div style="width:600px;flex:none;border-right:1px solid #1e2624;display:flex;flex-direction:column;background:rgba(255,255,255,.02)">
+            <div style="display:flex;align-items:center;justify-content:space-between;padding:16px 28px;border-bottom:1px solid #1e2624">
+              <div style="font-family:'JetBrains Mono',monospace;font-size:12px;color:#e9eeec">estados_2026_jun.pdf</div>
+              <div style="display:flex;align-items:center;gap:8px;font-family:'JetBrains Mono',monospace;font-size:11px;color:#5f6a67">
+                <span>pág. 2 / 7</span>
+                <span style="width:1px;height:12px;background:#2a3432"></span>
+                <span>original</span>
+              </div>
+            </div>
+            <div style="flex:1;display:flex;gap:16px;padding:22px 28px;min-height:0">
+              <div style="width:56px;flex:none;display:flex;flex-direction:column;gap:8px">
+                <div style="height:72px;border:2px solid #3ddfb4;border-radius:3px;background:repeating-linear-gradient(180deg,#1a2220 0 3px,#111716 3px 7px)"></div>
+                <div style="height:72px;border:1px solid #232b2a;border-radius:3px;background:repeating-linear-gradient(180deg,#161d1c 0 3px,#0f1413 3px 7px)"></div>
+                <div style="height:72px;border:1px solid #232b2a;border-radius:3px;background:repeating-linear-gradient(180deg,#161d1c 0 3px,#0f1413 3px 7px)"></div>
+                <div style="height:72px;border:1px solid #232b2a;border-radius:3px;background:repeating-linear-gradient(180deg,#161d1c 0 3px,#0f1413 3px 7px)"></div>
+              </div>
+              <div style="flex:1;border:1px solid #232b2a;border-radius:3px;position:relative;display:flex;flex-direction:column;justify-content:center;align-items:center;gap:14px;background-color:#0f1413;background-image:repeating-linear-gradient(180deg,#161d1c 0 6px,#0f1413 6px 15px)">
+                <div style="position:absolute;left:0;right:0;top:186px;height:34px;background:rgba(61,223,180,.12);border-top:1px solid rgba(61,223,180,.4);border-bottom:1px solid rgba(61,223,180,.4)"></div>
+                <div style="font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:#5f6a67;background:#0f1413;padding:6px 10px">vista del pdf original</div>
+              </div>
+            </div>
+            <div style="padding:14px 28px 22px">
+              <div style="display:flex;align-items:center;gap:10px;font-size:13px;color:#b9c3c0;line-height:1.5">
+                <span style="width:20px;height:12px;background:rgba(61,223,180,.18);border:1px solid rgba(61,223,180,.4);flex:none"></span>
+                El renglón resaltado es el que estás revisando a la derecha.
+              </div>
+            </div>
+          </div>
+
+          <div style="flex:1;display:flex;flex-direction:column;min-width:0">
+            <div style="padding:28px 36px 0;display:flex;flex-direction:column;gap:14px">
+              <div style="font-family:'Instrument Serif',serif;font-size:32px;line-height:1.12;color:#e9eeec;max-width:520px">Esto fue lo que leí. ¿Está bien?</div>
+              <sc-if value="{{ balanceOk }}" hint-placeholder-val="{{ true }}">
+                <div style="display:flex;align-items:center;gap:12px;padding:12px 16px;border:1px solid #1d4a3f;background:rgba(61,223,180,.07);border-radius:8px;animation:riseIn .5s ease both">
+                  <div style="width:8px;height:8px;border-radius:9999px;background:#3ddfb4"></div>
+                  <div style="font-size:14px;font-weight:500;color:#e9eeec">Cuadra: 62,200 = 26,600 + 35,600</div>
+                </div>
+              </sc-if>
+              <sc-if value="{{ balanceError }}" hint-placeholder-val="{{ false }}">
+                <div style="display:flex;align-items:center;gap:12px;padding:12px 16px;border:1px solid #5a2b26;background:rgba(224,122,112,.08);border-radius:8px">
+                  <div style="width:8px;height:8px;border-radius:9999px;background:#e07a70"></div>
+                  <div style="font-size:14px;font-weight:500;color:#e9eeec">Descuadre de 1,400 en el balance</div>
+                </div>
+              </sc-if>
+              <div style="display:flex;gap:22px;border-bottom:1px solid #1e2624">
+                <div style="padding:10px 0;border-bottom:2px solid #e9eeec;font-size:14px;font-weight:500;color:#e9eeec">Balance general</div>
+                <div style="padding:10px 0;border-bottom:2px solid transparent;font-size:14px;color:#7f8a87">Estado de resultados</div>
+                <div style="padding:10px 0;border-bottom:2px solid transparent;font-size:14px;color:#7f8a87">Notas</div>
+              </div>
+            </div>
+
+            <div style="flex:1;overflow:hidden;padding:6px 36px 0;display:flex;flex-direction:column">
+              <div style="padding:12px 4px 6px;font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:#7f8a87">Activos · USD</div>
+              <sc-for list="{{ activos }}" as="r" hint-placeholder-count="5">
+                <div style="display:grid;grid-template-columns:1fr 150px 96px;gap:16px;align-items:center;padding:11px 4px;border-bottom:1px solid #1a201f">
+                  <div style="display:flex;flex-direction:column;gap:2px">
+                    <div style="font-size:15px;color:#e9eeec">{{ r.c }}</div>
+                    <div style="font-family:'JetBrains Mono',monospace;font-size:11px;color:#5f6a67">{{ r.p }} · confianza {{ r.v }}</div>
+                  </div>
+                  <div style="font-family:'JetBrains Mono',monospace;font-size:16px;color:#e9eeec;text-align:right;font-variant-numeric:tabular-nums">{{ r.m }}</div>
+                  <div style="text-align:right;font-size:13px;color:#3ddfb4">Editar</div>
+                </div>
+              </sc-for>
+              <div style="display:grid;grid-template-columns:1fr 150px 96px;gap:16px;align-items:center;padding:14px 4px;border-top:1px solid #2a3432">
+                <div style="font-size:14px;font-weight:600;color:#e9eeec">Total activos</div>
+                <div style="font-family:'JetBrains Mono',monospace;font-size:18px;font-weight:600;color:#e9eeec;text-align:right;font-variant-numeric:tabular-nums">62,200</div>
+                <div></div>
+              </div>
+              <div style="display:grid;grid-template-columns:1fr 150px 96px;gap:16px;align-items:center;padding:6px 4px">
+                <div style="font-size:14px;color:#b9c3c0">Pasivo + patrimonio</div>
+                <div style="font-family:'JetBrains Mono',monospace;font-size:16px;color:#b9c3c0;text-align:right;font-variant-numeric:tabular-nums">62,200</div>
+                <div></div>
+              </div>
+            </div>
+
+            <div style="display:flex;align-items:center;justify-content:space-between;padding:18px 36px;border-top:1px solid #1e2624;background:rgba(255,255,255,.02)">
+              <button style="border:none;background:transparent;font-family:'Instrument Sans',sans-serif;font-size:14px;color:#7f8a87;padding:10px 0;cursor:pointer">Rechazar y subir otro PDF</button>
+              <div style="display:flex;align-items:center;gap:10px">
+                <button style="background:transparent;border:1px solid #2a3432;border-radius:9999px;font-family:'Instrument Sans',sans-serif;font-size:14px;font-weight:500;color:#e9eeec;padding:10px 20px;cursor:pointer">Corregir</button>
+                <button style="background:#e9eeec;border:none;border-radius:9999px;font-family:'Instrument Sans',sans-serif;font-size:14px;font-weight:500;color:#0a0d0d;padding:11px 24px;cursor:pointer">Confirmar y pedir primera lectura</button>
+              </div>
+            </div>
+          </div>
+        <div style="padding:12px 40px 14px;border-top:1px solid #1e2624;background:rgba(255,255,255,.02)">
+            <div style="display:flex;align-items:center;gap:12px;height:44px;background:#101514;border:1px solid #2a3432;border-radius:9999px;padding:0 6px 0 12px">
+              <button title="Adjuntar archivo" style="width:24px;height:24px;flex:none;border:1px solid #2a3432;border-radius:9999px;background:transparent;color:#b9c3c0;font-family:'Instrument Sans',sans-serif;font-size:16px;line-height:1;display:flex;align-items:center;justify-content:center;padding:0 0 1px;cursor:pointer">+</button>
+              <div style="flex:1;font-size:14px;color:#5f6a67">Pregúntale al Asesor Financiero…</div>
+              <button style="background:#e9eeec;border:none;border-radius:9999px;font-family:'Instrument Sans',sans-serif;font-size:13px;font-weight:500;color:#0a0d0d;padding:8px 20px;cursor:pointer;flex:none">Enviar</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;estadoDescuadre&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:false,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Estado de la pantalla&quot;}}">
+class Component extends DCLogic {
+  renderVals() {
+    const err = this.props.estadoDescuadre ?? false;
+    return {
+      balanceOk: !err,
+      balanceError: err,
+      activos: [
+        { c: 'Efectivo en bancos', p: 'p.2', m: '3,000', v: '100%' },
+        { c: 'Cuentas por cobrar', p: 'p.2', m: '10,000', v: '99%' },
+        { c: 'Inventario de materiales', p: 'p.2', m: '18,400', v: '97%' },
+        { c: 'Equipo y herramientas', p: 'p.3', m: '42,000', v: '99%' },
+        { c: 'Depreciación acumulada', p: 'p.3', m: '(11,200)', v: '96%' }
+      ],
+      activosA: [
+        { c: 'Efectivo en bancos', p: 'p.2', m: '3,000', v: '100%' }
+      ],
+      activosB: [
+        { c: 'Inventario de materiales', p: 'p.2', m: '18,400', v: '97%' },
+        { c: 'Equipo y herramientas', p: 'p.3', m: '42,000', v: '99%' },
+        { c: 'Depreciación acumulada', p: 'p.3', m: '(11,200)', v: '96%' }
+      ],
+      pasivos: [
+        { c: 'Cuentas por pagar', p: 'p.3', m: '9,800', v: '99%' },
+        { c: 'Préstamo bancario', p: 'p.3', m: '14,500', v: '98%' },
+        { c: 'Impuestos por pagar', p: 'p.3', m: '2,300', v: '97%' }
+      ],
+      patrimonio: [
+        { c: 'Capital social', p: 'p.4', m: '5,000', v: '100%' },
+        { c: 'Utilidades retenidas', p: 'p.4', m: '30,600', v: '98%' }
+      ],
+      resultados: [
+        { c: 'Ingresos por servicios', p: 'p.5', m: '214,800', v: '99%' },
+        { c: 'Costo de ventas', p: 'p.5', m: '131,500', v: '98%' },
+        { c: 'Gastos operativos', p: 'p.6', m: '28,900', v: '97%' },
+        { c: 'Depreciación del periodo', p: 'p.6', m: '3,200', v: '99%' },
+        { c: 'Gastos financieros', p: 'p.6', m: '1,200', v: '98%' }
+      ]
+    };
+  }
+}
+
+</script>
+</body>
+</html>

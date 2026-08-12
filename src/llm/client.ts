@@ -9,6 +9,7 @@
  */
 import Anthropic from "@anthropic-ai/sdk";
 import type { ModelId, Usage } from "../config/models.js";
+import { MockLlmProvider } from "./mockProvider.js";
 
 export interface ChatMessage {
   role: "user" | "assistant";
@@ -232,11 +233,23 @@ export class AnthropicProvider implements LlmProvider {
 
 /** Provider factory. Provider is a config value (LLM_PROVIDER). */
 export function createProvider(): LlmProvider {
-  const provider = process.env.LLM_PROVIDER ?? "anthropic";
-  switch (provider) {
+  const configured = (process.env.LLM_PROVIDER ?? "anthropic").toLowerCase();
+  const hasKey = Boolean(process.env.ANTHROPIC_API_KEY?.trim());
+
+  // No Anthropic key → mock (local golden path without Claude).
+  if (configured === "mock" || (configured === "anthropic" && !hasKey)) {
+    if (configured === "anthropic" && !hasKey) {
+      console.warn(
+        "[llm] ANTHROPIC_API_KEY empty — using MockLlmProvider (set LLM_PROVIDER=mock to silence).",
+      );
+    }
+    return new MockLlmProvider();
+  }
+
+  switch (configured) {
     case "anthropic":
       return new AnthropicProvider();
     default:
-      throw new Error(`Unknown LLM_PROVIDER: ${provider}`);
+      throw new Error(`Unknown LLM_PROVIDER: ${configured}`);
   }
 }

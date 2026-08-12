@@ -1,0 +1,134 @@
+:root,
+[data-theme="light"] {
+  --bg: linear-gradient(168deg, #eef2f1 0%, #f8faf9 42%, #f2f5f4 100%);
+  --surface: #ffffff;
+  --surface-tint: #f6f8f7;
+  --surface-foot: #fafbfb;
+  --row-tint: #f3f7f6;
+  --row-child: #f9fbfa;
+  --hairline: #e3e7e6;
+  --hairline-faint: #f0f3f2;
+  --hairline-faint-2: #e8ecec;
+  --hairline-strong: #cfd6d4;
+  --ink: #0e1413;
+  --body: #26302e;
+  --slate: #47514f;
+  --steel: #6d7876;
+  --muted: #98a19f;
+  --tree-label: #2e3836;
+  --accent: #00806a;
+  --accent-bright: #00b48a;
+  --accent-bg: #effaf6;
+  --accent-border: #b8e3d5;
+  --accent-select: rgba(0, 180, 138, 0.08);
+  --error: #c0483f;
+  --error-bg: #fdf2f1;
+  --error-border: #eec3bf;
+  --overdue-bg: #fdf5f4;
+  --overdue-border: #eec3bf;
+  --overdue-divider: #f0dbd8;
+  --overdue-reply: #fefaf9;
+  --overdue-reply-border: #f4e4e2;
+  --overdue-composer-border: #d9c6c3;
+  --overdue-composer-foot: #fbf7f7;
+  --overdue-meta-rule: #e3d0ce;
+  --rail-bg: rgba(255, 255, 255, 0.55);
+  --rail-active-bg: #0e1413;
+  --rail-active-fg: #ffffff;
+  --rail-active-badge: #ff8f8a;
+  --primary-btn-bg: #0e1413;
+  --primary-btn-fg: #ffffff;
+  --unread: #ff005f;
+  --chatbar-bg: rgba(255, 255, 255, 0.72);
+  --caret: #0e1413;
+  --dismissed-strike: #b8c0be;
+}
+
+[data-theme="dark"] {
+  --bg: radial-gradient(1100px 700px at 12% -10%, #12211e 0%, #0a0d0d 62%);
+  --surface: #101514;
+  --surface-tint: #151b1a;
+  --surface-foot: #0d1211;
+  --row-tint: #151b1a;
+  --row-child: #121817;
+  --hairline: #1e2624;
+  --hairline-faint: #171d1c;
+  --hairline-faint-2: #1a201f;
+  --hairline-strong: #2a3432;
+  --ink: #e9eeec;
+  --body: #cbd4d1;
+  --slate: #b9c3c0;
+  --steel: #7f8a87;
+  --muted: #5f6a67;
+  --tree-label: #cbd4d1;
+  --accent: #3ddfb4;
+  --accent-bright: #3ddfb4;
+  --accent-bg: rgba(61, 223, 180, 0.07);
+  --accent-border: #1d4a3f;
+  --accent-select: rgba(61, 223, 180, 0.1);
+  --error: #e07a70;
+  --error-bg: rgba(224, 122, 112, 0.08);
+  --error-border: #5a2b26;
+  --overdue-bg: rgba(224, 122, 112, 0.07);
+  --overdue-border: #5a2b26;
+  --overdue-divider: #3a201d;
+  --overdue-reply: rgba(224, 122, 112, 0.12);
+  --overdue-reply-border: #4a2a26;
+  --overdue-composer-border: #5a2b26;
+  --overdue-composer-foot: #1a1211;
+  --overdue-meta-rule: #5a2b26;
+  --rail-bg: rgba(16, 21, 20, 0.72);
+  --rail-active-bg: #182421;
+  --rail-active-fg: #e9eeec;
+  --rail-active-badge: #e07a70;
+  --primary-btn-bg: #e9eeec;
+  --primary-btn-fg: #0e1413;
+  --unread: #ff005f;
+  --chatbar-bg: rgba(16, 21, 20, 0.85);
+  --caret: #e9eeec;
+  --dismissed-strike: #5f6a67;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+  margin: 0;
+}
+
+body {
+  font-family: "Instrument Sans", sans-serif;
+  -webkit-font-smoothing: antialiased;
+  color: var(--ink);
+  background: #d9dedd;
+}
+
+button {
+  font: inherit;
+}
+
+@keyframes riseIn {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.mono {
+  font-family: "JetBrains Mono", monospace;
+  font-variant-numeric: tabular-nums;
+}
+
+.serif {
+  font-family: "Instrument Serif", serif;
+}
