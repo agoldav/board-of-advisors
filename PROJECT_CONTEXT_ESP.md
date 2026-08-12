@@ -793,13 +793,20 @@ vender el producto.
 
 ---
 
+**Sesión 2026-08-12 — Integración a `main`**
+
+- Mergeado en `main`: camino dorado + UI (PR #2), comentario por párrafo (PR #3), vista documento 1b (PR #4).
+- Ítem 4 (Create advisor / section) quedó acordado en alcance pero **sin construir** en esta sesión.
+
+---
+
 ### ⏳ Pendiente
 
 **Construcción UI — orden acordado (2026-08-10):**
-1. ~~Hilos de chat en BD (D-039)~~ — hecho 2026-08-11
-2. ~~Comentario por párrafo~~ — hecho 2026-08-12
-3. ~~Vista documento 1b~~ — hecho 2026-08-12
-4. Create advisor / Create section + arrastrar para anidar
+1. **Create advisor / Create section + arrastrar para anidar**, con:
+   - Botones Create new advisor / Create new section activos.
+   - Menú ⋮ (tres puntos) a la derecha de cada advisor y section: **Rename**, **Archive**, **Delete**, **Create Sub** (crea una sección/chat nuevo dentro del advisor o section).
+   - Arrastrar para mover y anidar todos los advisors y sections.
 
 **Diferidos a v2:**
 - Resumen nocturno (Batch API)
@@ -811,4 +818,4 @@ vender el producto.
 
 ---
 
-**Última actualización:** 2026-08-12 (vista documento 1b)
+**Última actualización:** 2026-08-12 (cierre sesión: ítems 2–3 en main; ítem 4 pendiente)

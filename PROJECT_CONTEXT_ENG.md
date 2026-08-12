@@ -769,13 +769,20 @@ change the architecture if deferred past it. Decide before the product is sold.
 
 ---
 
+**Session 2026-08-12 — Landed on `main`**
+
+- Merged to `main`: golden-path UI (PR #2), paragraph comments (PR #3), document view 1b (PR #4).
+- Item 4 (Create advisor / section) was scoped this session but **not built**.
+
+---
+
 ### ⏳ Pending
 
 **UI build — agreed order (2026-08-10):**
-1. ~~Chat threads in DB (D-039)~~ — done 2026-08-11
-2. ~~Paragraph comment~~ — done 2026-08-12
-3. ~~Document view 1b~~ — done 2026-08-12
-4. Create advisor / Create section + drag to nest
+1. **Create advisor / Create section + drag to nest**, including:
+   - Active Create new advisor / Create new section controls.
+   - ⋮ menu on each advisor and section: **Rename**, **Archive**, **Delete**, **Create Sub** (new section/chat inside the advisor or section).
+   - Drag to move and nest all advisors and sections.
 
 **Deferred to v2:**
 - Nightly digest (Batch API)
@@ -787,4 +794,4 @@ change the architecture if deferred past it. Decide before the product is sold.
 
 ---
 
-**Last Updated:** 2026-08-12 (document view 1b)
+**Last Updated:** 2026-08-12 (session close: items 2–3 on main; item 4 pending)
