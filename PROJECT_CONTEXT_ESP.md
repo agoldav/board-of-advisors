@@ -150,6 +150,7 @@ Pregunta: ¿vale el riesgo?
 | D-036 | 2026-08-08 | **El endpoint del barrido se autentica con una clave secreta compartida** (secretos de GitHub + variables del hosting). | Es alcanzable desde internet. Sin autenticación, cualquiera que lo encuentre puede dispararlo o leer datos de compromisos. |
 | D-037 | 2026-08-08 | **Extraer todos los renglones del estado financiero en la primera pasada, no solo los totales.** | El Caso C es una pregunta de renglón. Extraer solo resúmenes forzaría a reenviar el PDF completo en la consulta más importante del producto, a ~10× el costo. |
 | D-038 | 2026-08-08 | **La primera lectura se escribe en pantalla mientras se genera.** | Puede tardar minutos. Una rueda girando ese tiempo se lee como que se colgó y el dueño recarga. |
+| D-039 | 2026-08-10 | **Hilos de chat (y comentarios por párrafo) viven en la BD de la app**, igual que los compromisos. Exportar/importar archivo a carpeta local es respaldo opcional, no la fuente de verdad. | El caché del navegador se borra; vigilar una carpeta del disco es frágil (permisos, rutas, el browser no puede hacerlo bien). Confirmado por el dueño. |
 
 ---
 
@@ -653,43 +654,129 @@ vender el producto.
 
 ---
 
-**Sesión 2026-08-09 — Tarea 4 (ingesta de PDF)**
+**Sesión 2026-08-09 — Tareas 4, 8, 13 + PR #1 + operación GitHub**
 
-**Tarea 4 — Documentos (D-028 / D-037):**
-- `src/llm/client.ts`: `extractDocument` — PDF como document block nativo + tool forzado para extracción estructurada (sin librería de parseo).
-- `src/documents/`: ingest → extract (todos los renglones) → validación aritmética → confirmación / corrección / rechazo. Sin consejo hasta `confirmed` y cifras que cuadran.
-- Guard en `firstReading`: rechaza balance descuadrado antes de llamar al modelo.
-- Tests: estado inconsistente bloqueado; subtotales; parser del tool; gate de confirmación.
+**Tarea 4 — Ingesta de PDF (D-028 / D-037):**
+- Extracción nativa con Claude (document block + tool forzado); todos los renglones.
+- Validación aritmética; confirmación / corrección / rechazo antes de cualquier consejo.
+- Guard en primera lectura: no aconseja si el balance no cuadra.
 
-**Verificación:** 45 tests unitarios en verde; `tsc` estricto limpio.
+**Tarea 8 — Barrido de compromisos (D-029 / D-036):**
+- Endpoint `POST /api/sweep` con secreto compartido; un email por compromiso vencido por día (idempotente).
+- Workflow de GitHub Actions diario incluido en el PR.
+- Secret de GitHub `SWEEP_SHARED_SECRET` creado por el dueño.
+
+**Tarea 13 — Contador de gasto (D-032):**
+- Acumula gasto desde `llm_operations.usage`; aviso ≥90% / señal ≥100%; sin freno duro.
+
+**Entrega / repo:**
+- Pull request **mergeado** (2026-08-09): https://github.com/agoldav/board-of-advisors/pull/1 → `main` (`8da7017`).
+- `BUSINESS_CONTEXT.md` actualizado y metido en el PR (contexto que la app debe usar para aconsejar).
+- Regla local `.cursor/rules/secrets-handling.mdc`: no subir secretos a git; en docs públicos usar `********` + “ver en archivos locales”.
+- `gh` instalado y autenticado; token dedicado a esta app (separado del de otras apps).
+- Verificación: 61 tests unitarios en verde; `tsc` estricto limpio.
 
 ---
 
-**Sesión 2026-08-09 — Tareas 8 y 13**
+**Sesión 2026-08-10 — UI: diseño, shell React, acuerdos de hilos**
 
-**Tarea 8 — Barrido de compromisos (D-029 / D-036):**
-- `src/commitments/sweep.ts`: detecta vencidos (zona del dueño), inserta `followups` con clave de idempotencia, un email por compromiso/día.
-- `src/api/sweepAuth.ts` + `src/api/server.ts`: `POST /api/sweep` con secreto compartido (Bearer o `X-Sweep-Secret`).
-- `.github/workflows/commitment-sweep.yml`: cron diario → mismo endpoint.
-- Mailer enchufable (`ConsoleMailer`); destino vía `OWNER_NOTIFY_EMAIL` (sin columna email en owners).
+**Diseño:**
+- Brief para Claude Design: `docs/19-CLAUDE-DESIGN-BRIEF.md` (también en `UI Design/`).
+- Handoff de diseño recibido en `UI Design/` (README + standalone + source); dirección **1a** (rail permanente) adoptada para datos/conversación.
 
-**Tarea 13 — Contador de gasto (D-032):**
-- `src/llm/spend.ts`: acumula desde `llm_operations.usage`; aviso ≥90% / señal ≥100%; sin freno duro.
+**UI implementada (`web/` — React + Vite):**
+- Pantallas: Confirmación de cifras, Primera lectura, Chat, Compromisos.
+- Shell compartido: rail izquierdo + barra de preguntar; claro por defecto y oscuro.
+- Settings al hacer clic en el nombre del usuario (abajo a la izquierda); selector de tema ahí.
+- Datos de ejemplo (fixtures) para poder navegar sin cablear el backend todavía.
+- Probar en: http://127.0.0.1:5173 (`npm run web:dev`).
 
-**Verificación:** 61 tests unitarios en verde; `tsc` estricto limpio.
+**Decisiones cerradas esta sesión:**
+| # | Fecha | Decisión |
+|---|-------|----------|
+| D-039 | 2026-08-10 | **Hilos de chat (y comentarios por párrafo) viven en la BD de la app**; export/import a carpeta local es respaldo opcional, no la fuente de verdad. |
+
+**Acuerdos de producto (registrados, aún no construidos):** ver Pendiente — orden de construcción UI.
+
+---
+
+**Sesión 2026-08-11 — Hosting del barrido + secrets**
+
+**Decisión de producto:**
+- Se eliminó de Pendiente la tarea “activar recarga automática en Anthropic” (el dueño no la hará).
+
+**Hosting (ítem 6 del orden UI + secrets inmediatos):**
+- Postgres en **Neon**; esquema `0001_initial_schema.sql` aplicado.
+- Web service en **Render Free**: `https://board-of-advisors-sweep.onrender.com`
+- Código: `GET /health` (y `GET /`) + script `npm start` (commit `6b91bbe` en `main`).
+- Secrets alineados: `.env` local, env de Render (`DATABASE_URL`, `SWEEP_SHARED_SECRET`, `OWNER_NOTIFY_EMAIL`), GitHub Secrets (`SWEEP_URL`, `SWEEP_SHARED_SECRET`).
+- Workflow `commitment-sweep` disparado a mano: **verde**.
+
+---
+
+**Sesión 2026-08-11 — Camino dorado cableado (sin Anthropic) + panel de datos**
+
+**Acuerdo de esta sesión:**
+- Seguir con el ítem 1 de Pendiente **sin** agregar la API key de Claude todavía.
+- Usar datos reales en Postgres; el LLM queda en mock hasta que el dueño conecte Anthropic.
+
+**Backend / API:**
+- `MockLlmProvider` + `LLM_PROVIDER=mock` (o Anthropic vacío → mock automático).
+- Rutas HTTP del camino dorado: sesión, documento demo, confirmación/corrección de cifras, primera lectura (stream NDJSON), crear/listar/transicionar compromisos.
+- Bootstrap de owner + perfil + conversación; persistencia de compromisos (`src/commitments/service.ts`).
+- Seed demo de cifras balanceadas sin llamar a Claude (`POST /api/documents/demo`).
+
+**UI cableada (`web/`):**
+- Confirmación de cifras, Primera lectura y Compromisos dejan de usar solo fixtures: hablan con la API (proxy Vite → `:8787`).
+- Corrección de desfase sesión/documento (Strict Mode): una sola sesión en vuelo; `documentId` atado al `ownerId`.
+- Primera lectura: panel derecho reabrible (**Cifra / Tabla / Gráfica**) a la par del texto, con renglones confirmados y gráfica de composición.
+
+**Verificación:** typecheck limpio; 64 tests en verde; humo E2E del camino dorado contra Neon OK.
+
+---
+
+**Sesión 2026-08-11 — Subida real de PDF + Claude**
+
+**Acuerdo:** ítem 1 de Pendiente. `ANTHROPIC_API_KEY` en `.env` local; `LLM_PROVIDER=anthropic`.
+
+**Backend:**
+- `POST /api/documents/upload` — cuerpo binario PDF + `X-Filename` / `X-Owner-Id` → `ingestFinancialPdf` (Claude nativo; mock si no hay key).
+- `GET /api/llm/status` — la UI sabe si está en mock o Anthropic.
+- Límite 20 MB; rechazo si no es PDF; 422 si no es estado financiero / extracción vacía.
+
+**UI (`Confirmación de cifras`):**
+- Estado vacío con subida (clic o arrastrar). Ya no siembra demo al entrar.
+- Extrae renglones, confirma / corrige / rechaza como antes. Demo queda como atajo (“usar demo”).
+
+**Verificación:** 69 tests en verde; typecheck + `web` build limpios; ping Anthropic Haiku 4.5 OK. El dueño subió un PDF real en `http://localhost:5173/cifras` y confirmó que funcionó.
+
+---
+
+**Sesión 2026-08-11 — Hilos de chat en BD (D-039)**
+
+**Ítem 1 de Pendiente.** Fuente de verdad: tablas `conversations` / `messages` (sin migración; el schema de Completado ya las tenía).
+
+**Backend (nuevo, sin cambiar `askAdvisor` ni el bootstrap de sesión):**
+- `src/conversations/service.ts` — listar / crear / renombrar / borrar / exportar / importar.
+- No se puede borrar el último hilo.
+- `POST /api/conversations/:id/messages` llama al `askAdvisor` existente.
+- Export JSON opcional (respaldo); import crea un hilo nuevo.
+
+**UI:**
+- Rail: hilos reales + Nuevo hilo / importar / exportar / borrar.
+- `/chat/:id` lee y escribe contra la API. La página de fixtures queda reemplazada.
+
+**Sin tocar:** schema `0001`, `firstReading`, confirmación de cifras, compromisos, `ensureSession` (sigue garantizando al menos un hilo).
 
 ---
 
 ### ⏳ Pendiente
 
-**Bloqueadores inmediatos (acción manual del dueño):**
-1. **Activar recarga automática en Anthropic** — Evitar sorpresas si los $20 iniciales se agotan.
-   - [ ] Configurar en consola de Anthropic
-   - [ ] Considerar API key aparte para esta app
-2. **Secrets del barrido** (para que Actions funcione):
-   - [ ] `SWEEP_SHARED_SECRET` en host + GitHub Secrets
-   - [ ] `SWEEP_URL` en GitHub Secrets (URL pública del servidor)
-   - [ ] `OWNER_NOTIFY_EMAIL` en el host
+**Construcción UI — orden acordado (2026-08-10):**
+1. ~~Hilos de chat en BD (D-039)~~ — hecho 2026-08-11
+2. Comentario por párrafo (hilo anclado; el dueño puede seguir preguntando sobre ese párrafo)
+3. Vista documento **1b** al adjuntar PDF/JPG/etc. (documento a la par del asesor; 1a = datos/chat)
+4. Create advisor / Create section + arrastrar para anidar
 
 **Diferidos a v2:**
 - Resumen nocturno (Batch API)
@@ -699,10 +786,6 @@ vender el producto.
 - Cifrado de API keys en BD
 - Headroom (compresión de contexto)
 
-**Siguiente construcción probable (fuera del plan eng P1/P3 restante):**
-- UI / pantallas (confirmación de cifras, chat, first read, commitments)
-- Hosting del endpoint de barrido
-
 ---
 
-**Última actualización:** 2026-08-09 (Tareas 4, 8, 13)
+**Última actualización:** 2026-08-11 (hilos de chat en BD)

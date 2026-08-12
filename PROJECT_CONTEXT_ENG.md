@@ -145,6 +145,7 @@ defensive against bad actors rather than predatory. Question: is the risk worth 
 | D-036 | 2026-08-08 | **The sweep endpoint authenticates with a shared secret** (GitHub Secrets + host env). | It is reachable from the internet. Unauthenticated, anyone who finds it can trigger it or read commitment data. |
 | D-037 | 2026-08-08 | **Extract every line item from financial statements on the first pass, not just totals.** | Use Case C is a line-item question. Extracting summaries only would force a full PDF re-send on the product's most important query, at ~10× the cost. |
 | D-038 | 2026-08-08 | **The first read streams to the screen.** | It can take minutes. A spinner that long reads as a hang and the owner reloads. |
+| D-039 | 2026-08-10 | **Chat threads (and paragraph comments) live in the app DB**, same as commitments. File export/import to a local folder is optional backup, not the source of truth. | Browser cache gets cleared; watching a disk folder is fragile (permissions, paths, browsers can't do it well). Confirmed by the owner. |
 
 ---
 
@@ -607,20 +608,151 @@ change the architecture if deferred past it. Decide before the product is sold.
 
 ---
 
+**Session 2026-08-09 — Implementation Tasks 1–3 (built in Cursor)**
+
+**Stack decision:**
+- **TypeScript + Node, raw SQL with `pg` (no ORM), luxon for timezone-aware dates.**
+
+**Task 1 — Database schema (commit `8202b5c`):**
+- `db/migrations/0001_initial_schema.sql`: 11 tables, 8 enums, indexes and constraints. PostgreSQL, schema only.
+- `owner_id` on every table (D-030); 4096-token floor CHECK on `profile_versions` (D-031); `overdue` never stored and dismiss requires reason (D-033); recommendation traceability set (D-035); line-item `extracted_figures` (D-037); `input_state` on `llm_operations` for persist-before-call (D-029).
+
+**Task 2 — Backend core (commit `be220ec`):**
+- Business profile: byte-stable render + versioning service with real tokenizer floor (D-008/D-031).
+- Model router: classify then route → Haiku/Sonnet/Opus (D-006/D-009); first read → Opus (D-021). Anthropic client with `cache_control`, streaming, `count_tokens`, `usage`, `refusal` handling.
+- Commitment state machine: validated transitions; `overdue` computed on read in the owner's timezone (D-033).
+
+**Task 3 — Advisor engine (commit `d13fc55`):**
+- `askAdvisor` (1:1 chat) and `firstReading` (streamed cash reconciliation — D-021/D-038).
+- Persist-before-call with friendly out-of-credits message (D-029); full recommendation traceability (D-035).
+- Versioned YAML advisor configs (finance complete, operations stub) + registry (D-034).
+- Pure reconciliation helpers (D-021/D-037).
+
+**Verification:** 32 unit tests green; strict `tsc` clean.
+
+---
+
+**Session 2026-08-09 — Tasks 4, 8, 13 + PR #1 + GitHub ops**
+
+**Task 4 — PDF ingestion (D-028 / D-037):**
+- Native Claude extraction (document block + forced tool); every line item.
+- Arithmetic validation; confirm / correct / reject before any advice.
+- First-read guard: no advice if the balance sheet does not reconcile.
+
+**Task 8 — Commitment sweep (D-029 / D-036):**
+- `POST /api/sweep` with shared-secret auth; one email per overdue commitment per day (idempotent).
+- Daily GitHub Actions workflow included in the PR.
+- GitHub secret `SWEEP_SHARED_SECRET` created by the owner.
+
+**Task 13 — Spend counter (D-032):**
+- Accumulates from `llm_operations.usage`; warn at ≥90% / signal at ≥100%; no hard cutoff.
+
+**Delivery / repo:**
+- Pull request **merged** (2026-08-09): https://github.com/agoldav/board-of-advisors/pull/1 → `main` (`8da7017`).
+- `BUSINESS_CONTEXT.md` updated and included in the PR (context the app must use for advice).
+- Local rule `.cursor/rules/secrets-handling.mdc`: never push secrets; public docs use `********` + “see local files”.
+- `gh` installed and authenticated; dedicated token for this app.
+- Verification: 61 unit tests green; strict `tsc` clean.
+
+---
+
+**Session 2026-08-10 — UI: design, React shell, thread agreements**
+
+**Design:**
+- Brief for Claude Design: `docs/19-CLAUDE-DESIGN-BRIEF.md` (also under `UI Design/`).
+- Design handoff received in `UI Design/` (README + standalone + source); direction **1a** (persistent rail) adopted for data/conversation.
+
+**UI implemented (`web/` — React + Vite):**
+- Screens: Figure confirmation, First reading, Chat, Commitments.
+- Shared shell: left rail + ask bar; light default and dark.
+- Settings opened by clicking the owner name (bottom left); theme selector lives there.
+- Fixture/example data so the app can be browsed before wiring the backend.
+- Try at: http://127.0.0.1:5173 (`npm run web:dev`).
+
+**Decisions closed this session:**
+| # | Date | Decision |
+|---|------|----------|
+| D-039 | 2026-08-10 | **Chat threads (and paragraph comments) live in the app DB**; local-folder export/import is optional backup, not the source of truth. |
+
+**Product agreements (recorded, not yet built):** see Pending — UI build order.
+
+---
+
+**Session 2026-08-11 — Sweep hosting + secrets**
+
+**Product decision:**
+- Removed from Pending the “enable Anthropic auto-reload” task (owner will not do it).
+
+**Hosting (UI order item 6 + immediate secrets):**
+- Postgres on **Neon**; schema `0001_initial_schema.sql` applied.
+- Web service on **Render Free**: `https://board-of-advisors-sweep.onrender.com`
+- Code: `GET /health` (and `GET /`) + `npm start` script (commit `6b91bbe` on `main`).
+- Secrets aligned: local `.env`, Render env (`DATABASE_URL`, `SWEEP_SHARED_SECRET`, `OWNER_NOTIFY_EMAIL`), GitHub Secrets (`SWEEP_URL`, `SWEEP_SHARED_SECRET`).
+- Manual `commitment-sweep` Actions run: **green**.
+
+---
+
+**Session 2026-08-11 — Golden path wired (no Anthropic) + evidence panel**
+
+**Agreement this session:**
+- Continue Pending item 1 **without** adding a Claude API key yet.
+- Use real Postgres data; keep the LLM on mock until the owner connects Anthropic.
+
+**Backend / API:**
+- `MockLlmProvider` + `LLM_PROVIDER=mock` (or empty Anthropic key → automatic mock).
+- Golden-path HTTP routes: session, demo document, figure confirm/correct, first reading (NDJSON stream), create/list/transition commitments.
+- Owner + profile + conversation bootstrap; commitment persistence (`src/commitments/service.ts`).
+- Balanced demo figure seed with no Claude call (`POST /api/documents/demo`).
+
+**UI wired (`web/`):**
+- Figure confirmation, First reading, and Commitments no longer fixture-only: they call the API (Vite proxy → `:8787`).
+- Session/document mismatch fix (Strict Mode): single-flight session; `documentId` bound to `ownerId`.
+- First reading: reopenable right panel (**Figure / Table / Chart**) beside the prose, using confirmed line items and a composition chart.
+
+**Verification:** clean typecheck; 64 tests green; golden-path smoke against Neon OK.
+
+---
+
+**Session 2026-08-11 — Real PDF upload + Claude**
+
+**Agreement:** Pending item 1. `ANTHROPIC_API_KEY` in local `.env`; `LLM_PROVIDER=anthropic`.
+
+**Backend:**
+- `POST /api/documents/upload` — raw PDF body + `X-Filename` / `X-Owner-Id` → `ingestFinancialPdf` (native Claude; mock if no key).
+- `GET /api/llm/status` — UI can tell mock vs Anthropic.
+- 20 MB cap; reject non-PDF; 422 if not a financial statement / empty extraction.
+
+**UI (Confirm figures):**
+- Empty state with upload (click or drop). No longer auto-seeds demo on entry.
+- Extract → confirm / correct / reject as before. Demo remains a shortcut (“usar demo”).
+
+**Verification:** 69 tests green; typecheck + web build clean; Anthropic Haiku 4.5 ping OK. Owner uploaded a real PDF at `http://localhost:5173/cifras` and confirmed it worked.
+
+---
+
+**Session 2026-08-11 — Chat threads in DB (D-039)**
+
+**Pending item 1.** Source of truth: existing `conversations` / `messages` tables (no migration).
+
+**Backend (new; `askAdvisor` and session bootstrap unchanged):**
+- `src/conversations/service.ts` — list / create / rename / delete / export / import.
+- Cannot delete the last thread.
+- `POST /api/conversations/:id/messages` calls existing `askAdvisor`.
+- Optional JSON export (backup); import creates a new thread.
+
+**UI:** rail lists real threads; `/chat/:id` reads/writes the API.
+
+**Unchanged:** schema `0001`, first reading, figure confirmation, commitments, `ensureSession` (still ensures at least one thread).
+
+---
+
 ### ⏳ Pending
 
-**Immediate blockers:**
-1. **Enable auto-reload in Anthropic console** — Avoid surprises if initial $20 is exhausted.
-   - [ ] Configure in Anthropic console
-   - [ ] Consider separate API key for this app
-
-**Build order:**
-1. **Database schema** — Tables only, no logic.
-2. **In parallel:**
-   - Business profile (cached context)
-   - Model layer (abstraction for Haiku/Sonnet/Opus routing)
-   - Commitment subsystem (state machine)
-3. **Advice engine** — Waits for model layer to be ready
+**UI build — agreed order (2026-08-10):**
+1. ~~Chat threads in DB (D-039)~~ — done 2026-08-11
+2. Paragraph comment (anchored thread; owner can keep asking about that paragraph)
+3. Document view **1b** when attaching PDF/JPG/etc. (document beside advisor; 1a = data/chat)
+4. Create advisor / Create section + drag to nest
 
 **Deferred to v2:**
 - Nightly digest (Batch API)
@@ -630,11 +762,6 @@ change the architecture if deferred past it. Decide before the product is sold.
 - API-key encryption at rest
 - Headroom (context compression)
 
-**Critical tests (T5, T7, T11):**
-- Prefix under 4096 tokens → cache never hits, full price forever, silent failure
-- stop_reason: refusal unhandled → blank screen looks like app error
-- Timezone on overdue dates → alerts arrive a day early or late
-
 ---
 
-**Last Updated:** 2026-08-08 (Post-/plan-eng-review)
+**Last Updated:** 2026-08-11 (chat threads in DB)
