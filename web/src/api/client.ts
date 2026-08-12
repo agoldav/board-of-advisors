@@ -412,12 +412,22 @@ export async function transitionCommitmentApi(args: {
   return data.item;
 }
 
+export type ParagraphAnchor = {
+  kind: "paragraph";
+  sectionKey: string;
+  sectionTitle: string;
+  excerpt: string;
+  parentConversationId?: string;
+  source?: "first_reading" | "chat";
+};
+
 export type ConversationSummary = {
   id: string;
   title: string;
   createdAt: string;
   lastActivityAt: string;
   messageCount: number;
+  anchor: ParagraphAnchor | null;
 };
 
 export type ConversationMessage = {
@@ -516,6 +526,25 @@ export async function importConversationApi(
       method: "POST",
       ownerId,
       body: JSON.stringify({ ownerId, payload }),
+    },
+  );
+  return data.item;
+}
+
+export async function ensureParagraphThread(args: {
+  ownerId: string;
+  sectionKey: string;
+  sectionTitle: string;
+  excerpt: string;
+  parentConversationId?: string;
+  source?: "first_reading" | "chat";
+}): Promise<ConversationDetail> {
+  const data = await api<{ ok: boolean; item: ConversationDetail }>(
+    "/api/conversations/paragraph",
+    {
+      method: "POST",
+      ownerId: args.ownerId,
+      body: JSON.stringify(args),
     },
   );
   return data.item;

@@ -38,6 +38,64 @@ export function LeftRail() {
     ? pathname.slice("/chat/".length).split("/")[0]
     : null;
 
+  const topLevel = items.filter((t) => !t.anchor);
+  const childrenByParent = new Map<string, typeof items>();
+  for (const t of items) {
+    const parentId = t.anchor?.parentConversationId;
+    if (!parentId) continue;
+    const list = childrenByParent.get(parentId) ?? [];
+    list.push(t);
+    childrenByParent.set(parentId, list);
+  }
+  const orphanParagraphs = items.filter(
+    (t) =>
+      t.anchor &&
+      (!t.anchor.parentConversationId ||
+        !items.some((p) => p.id === t.anchor?.parentConversationId)),
+  );
+
+  function renderThreadRow(thread: (typeof items)[number]) {
+    return (
+      <div
+        key={thread.id}
+        className={`tree-row-wrap ${activeThreadId === thread.id ? "is-active" : ""}`}
+      >
+        <NavLink
+          to={`/chat/${thread.id}`}
+          className={`tree-row ${activeThreadId === thread.id ? "is-active" : ""}`}
+        >
+          <span className="elbow" />
+          <span className="tree-label">{thread.title}</span>
+        </NavLink>
+        <div className="tree-actions">
+          <button
+            type="button"
+            className="tree-icon-btn"
+            title="Exportar hilo"
+            onClick={() => {
+              void exportThread(thread.id).catch((err: unknown) => {
+                window.alert(
+                  err instanceof Error ? err.message : "No se pudo exportar.",
+                );
+              });
+            }}
+          >
+            ↓
+          </button>
+          <button
+            type="button"
+            className="tree-icon-btn"
+            title="Borrar hilo"
+            disabled={items.length <= 1}
+            onClick={() => void onDelete(thread.id)}
+          >
+            ×
+          </button>
+        </div>
+      </div>
+    );
+  }
+
   async function onCreate() {
     try {
       const item = await createThread();
@@ -92,43 +150,16 @@ export function LeftRail() {
           </div>
           <div className="thread-tree">
             {listError && <div className="tree-error">{listError}</div>}
-            {items.map((thread) => (
-              <div
-                key={thread.id}
-                className={`tree-row-wrap ${activeThreadId === thread.id ? "is-active" : ""}`}
-              >
-                <NavLink
-                  to={`/chat/${thread.id}`}
-                  className={`tree-row ${activeThreadId === thread.id ? "is-active" : ""}`}
-                >
-                  <span className="elbow" />
-                  <span className="tree-label">{thread.title}</span>
-                </NavLink>
-                <div className="tree-actions">
-                  <button
-                    type="button"
-                    className="tree-icon-btn"
-                    title="Exportar hilo"
-                    onClick={() => {
-                      void exportThread(thread.id).catch((err: unknown) => {
-                        window.alert(
-                          err instanceof Error ? err.message : "No se pudo exportar.",
-                        );
-                      });
-                    }}
-                  >
-                    ↓
-                  </button>
-                  <button
-                    type="button"
-                    className="tree-icon-btn"
-                    title="Borrar hilo"
-                    disabled={items.length <= 1}
-                    onClick={() => void onDelete(thread.id)}
-                  >
-                    ×
-                  </button>
-                </div>
+            {[...topLevel, ...orphanParagraphs].map((thread) => (
+              <div key={thread.id}>
+                {renderThreadRow(thread)}
+                {(childrenByParent.get(thread.id) ?? []).length > 0 && (
+                  <div className="thread-tree nested">
+                    {(childrenByParent.get(thread.id) ?? []).map((child) =>
+                      renderThreadRow(child),
+                    )}
+                  </div>
+                )}
               </div>
             ))}
             <button type="button" className="tree-row tree-row-action" onClick={() => void onCreate()}>

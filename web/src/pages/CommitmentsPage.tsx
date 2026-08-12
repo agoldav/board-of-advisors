@@ -190,6 +190,9 @@ export function CommitmentsPage() {
                     eyebrow="Sobre este compromiso"
                     placeholder="Nota para el board…"
                     onClose={() => setShowComposer(false)}
+                    onSubmit={() => {
+                      setShowComposer(false);
+                    }}
                   />
                 )}
               </div>

@@ -770,11 +770,23 @@ vender el producto.
 
 ---
 
+**Sesión 2026-08-12 — Comentario por párrafo**
+
+**Ítem 2 de Pendiente.** Hilo anclado a un párrafo de la primera lectura; se puede seguir preguntando.
+
+**Cómo (sin migración ni cambio a `askAdvisor`):**
+- Ancla = mensaje `system` con prefijo `__boa_anchor_v1__` + JSON (sección, extracto, padre).
+- `POST /api/conversations/paragraph` — find-or-create por `(owner, parent, sectionKey)`.
+- Al enviar, el API arma el prompt con extracto + historial; guarda en BD solo la pregunta corta.
+- UI: al seleccionar un párrafo en `/lectura` se abre el composer bajo el texto; respuestas quedan en el hilo; el rail anida hilos `Sobre: …` bajo el padre.
+
+---
+
 ### ⏳ Pendiente
 
 **Construcción UI — orden acordado (2026-08-10):**
 1. ~~Hilos de chat en BD (D-039)~~ — hecho 2026-08-11
-2. Comentario por párrafo (hilo anclado; el dueño puede seguir preguntando sobre ese párrafo)
+2. ~~Comentario por párrafo~~ — hecho 2026-08-12
 3. Vista documento **1b** al adjuntar PDF/JPG/etc. (documento a la par del asesor; 1a = datos/chat)
 4. Create advisor / Create section + arrastrar para anidar
 
@@ -788,4 +800,4 @@ vender el producto.
 
 ---
 
-**Última actualización:** 2026-08-11 (hilos de chat en BD)
+**Última actualización:** 2026-08-12 (comentario por párrafo)

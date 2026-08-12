@@ -1,8 +1,17 @@
 /**
  * Chat threads in the app database (D-039). Create / list / get / delete,
  * plus optional JSON export/import. Scoped by owner_id (D-030).
+ * Paragraph-anchored threads (Pending item 2) use a system-message marker —
+ * no schema change to 0001.
  */
 import { getPool, withTransaction } from "../db/pool.js";
+import {
+  parseAnchor,
+  paragraphThreadTitle,
+  serializeAnchor,
+  ANCHOR_PREFIX,
+  type ParagraphAnchor,
+} from "./anchors.js";
 import {
   parseConversationExport,
   serializeConversationExport,
@@ -31,6 +40,7 @@ export type ConversationSummary = {
   createdAt: string;
   lastActivityAt: string;
   messageCount: number;
+  anchor: ParagraphAnchor | null;
 };
 
 export type ConversationMessage = {
@@ -62,10 +72,12 @@ export async function listConversations(
     created_at: Date;
     last_activity_at: Date;
     message_count: string;
+    anchor_content: string | null;
   }>(
     `SELECT c.id, c.title, c.created_at,
             COALESCE(m.last_at, c.created_at) AS last_activity_at,
-            COALESCE(m.message_count, 0)::text AS message_count
+            COALESCE(m.message_count, 0)::text AS message_count,
+            a.content AS anchor_content
        FROM conversations c
        LEFT JOIN (
          SELECT conversation_id, MAX(created_at) AS last_at, COUNT(*)::int AS message_count
@@ -73,6 +85,13 @@ export async function listConversations(
           WHERE owner_id = $1
           GROUP BY conversation_id
        ) m ON m.conversation_id = c.id
+       LEFT JOIN LATERAL (
+         SELECT content
+           FROM messages
+          WHERE conversation_id = c.id AND owner_id = $1 AND role = 'system'
+          ORDER BY created_at ASC
+          LIMIT 1
+       ) a ON true
       WHERE c.owner_id = $1
       ORDER BY last_activity_at DESC, c.created_at DESC`,
     [ownerId],
@@ -83,6 +102,7 @@ export async function listConversations(
     createdAt: row.created_at.toISOString(),
     lastActivityAt: row.last_activity_at.toISOString(),
     messageCount: Number(row.message_count),
+    anchor: row.anchor_content ? parseAnchor(row.anchor_content) : null,
   }));
 }
 
@@ -107,6 +127,7 @@ export async function createConversation(args: {
     createdAt: row.created_at.toISOString(),
     lastActivityAt: row.created_at.toISOString(),
     messageCount: 0,
+    anchor: null,
   };
 }
 
@@ -143,6 +164,15 @@ export async function getConversation(
     [conversationId, ownerId],
   );
 
+  const mapped = messages.map((m) => ({
+    id: m.id,
+    role: m.role,
+    content: m.content,
+    advisorId: m.advisor_id,
+    modelUsed: m.model_used,
+    createdAt: m.created_at.toISOString(),
+  }));
+  const anchorMsg = mapped.find((m) => m.role === "system" && parseAnchor(m.content));
   const last = messages[messages.length - 1];
   return {
     id: conv.id,
@@ -150,15 +180,69 @@ export async function getConversation(
     createdAt: conv.created_at.toISOString(),
     lastActivityAt: (last?.created_at ?? conv.created_at).toISOString(),
     messageCount: messages.length,
-    messages: messages.map((m) => ({
-      id: m.id,
-      role: m.role,
-      content: m.content,
-      advisorId: m.advisor_id,
-      modelUsed: m.model_used,
-      createdAt: m.created_at.toISOString(),
-    })),
+    anchor: anchorMsg ? parseAnchor(anchorMsg.content) : null,
+    messages: mapped,
   };
+}
+
+/**
+ * Find or create a conversation anchored to a reading/chat paragraph.
+ * Idempotent per (owner, parentConversationId, sectionKey).
+ */
+export async function getOrCreateParagraphThread(args: {
+  ownerId: string;
+  anchor: ParagraphAnchor;
+}): Promise<ConversationDetail> {
+  const pool = getPool();
+  const { rows } = await pool.query<{ id: string; content: string }>(
+    `SELECT c.id, m.content
+       FROM conversations c
+       JOIN messages m
+         ON m.conversation_id = c.id
+        AND m.owner_id = c.owner_id
+        AND m.role = 'system'
+      WHERE c.owner_id = $1
+        AND m.content LIKE $2
+      ORDER BY c.created_at ASC`,
+    [args.ownerId, `${ANCHOR_PREFIX}%`],
+  );
+
+  for (const row of rows) {
+    const parsed = parseAnchor(row.content);
+    if (!parsed) continue;
+    if (parsed.sectionKey !== args.anchor.sectionKey) continue;
+    const sameParent =
+      (parsed.parentConversationId ?? null) ===
+      (args.anchor.parentConversationId ?? null);
+    if (!sameParent) continue;
+    return getConversation(args.ownerId, row.id);
+  }
+
+  const title = paragraphThreadTitle(args.anchor.sectionTitle);
+  return withTransaction(async (client) => {
+    const { rows: convRows } = await client.query<{ id: string }>(
+      `INSERT INTO conversations (owner_id, title) VALUES ($1, $2) RETURNING id`,
+      [args.ownerId, title],
+    );
+    const id = convRows[0]!.id;
+    await client.query(
+      `INSERT INTO messages (owner_id, conversation_id, role, content)
+       VALUES ($1, $2, 'system', $3)`,
+      [args.ownerId, id, serializeAnchor(args.anchor)],
+    );
+    return id;
+  }).then((id) => getConversation(args.ownerId, id));
+}
+
+export async function rewriteUserMessageContent(args: {
+  ownerId: string;
+  messageId: string;
+  content: string;
+}): Promise<void> {
+  await getPool().query(
+    `UPDATE messages SET content = $1 WHERE id = $2 AND owner_id = $3 AND role = 'user'`,
+    [args.content, args.messageId, args.ownerId],
+  );
 }
 
 export async function renameConversation(args: {
@@ -186,6 +270,7 @@ export async function renameConversation(args: {
     createdAt: detail.createdAt,
     lastActivityAt: detail.lastActivityAt,
     messageCount: detail.messageCount,
+    anchor: detail.anchor,
   };
 }
 
