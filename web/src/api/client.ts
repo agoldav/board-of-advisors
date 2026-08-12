@@ -441,6 +441,13 @@ export type ConversationMessage = {
 
 export type ConversationDetail = ConversationSummary & {
   messages: ConversationMessage[];
+  attachment?: AttachmentMeta | null;
+};
+
+export type AttachmentMeta = {
+  documentId: string;
+  fileName: string;
+  mimeType: "application/pdf" | "image/jpeg" | "image/png";
 };
 
 export async function fetchConversations(
@@ -548,6 +555,38 @@ export async function ensureParagraphThread(args: {
     },
   );
   return data.item;
+}
+
+export async function attachConversationFile(args: {
+  ownerId: string;
+  conversationId: string;
+  file: File;
+}): Promise<AttachmentMeta> {
+  const headers = new Headers({
+    "content-type": args.file.type || "application/octet-stream",
+    "X-Owner-Id": args.ownerId,
+    "X-Filename": encodeURIComponent(args.file.name),
+  });
+  const res = await fetch(`/api/conversations/${args.conversationId}/attachments`, {
+    method: "POST",
+    headers,
+    body: args.file,
+  });
+  const data = (await res.json()) as {
+    ok?: boolean;
+    attachment?: AttachmentMeta;
+    error?: string;
+  };
+  if (!res.ok || !data.attachment) {
+    throw new Error(data.error ?? `HTTP ${res.status}`);
+  }
+  return data.attachment;
+}
+
+/** Authenticated-ish file URL for the document pane (owner via header is not possible in iframe). */
+export function documentFileUrl(documentId: string, ownerId: string): string {
+  const q = new URLSearchParams({ ownerId });
+  return `/api/documents/${documentId}/file?${q.toString()}`;
 }
 
 export async function sendConversationMessage(args: {

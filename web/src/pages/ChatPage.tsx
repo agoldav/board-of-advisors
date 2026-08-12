@@ -1,12 +1,15 @@
 import { useEffect, useRef, useState } from "react";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import {
+  attachConversationFile,
   fetchConversation,
   getDocumentId,
   sendConversationMessage,
+  type AttachmentMeta,
   type ConversationDetail,
   type ConversationMessage,
 } from "../api/client";
+import { DocumentPane } from "../components/DocumentPane";
 import { useConversations } from "../conversations/context";
 
 type LocationState = { pendingQuestion?: string } | null;
@@ -75,18 +78,19 @@ export function ChatPage() {
   const { conversationId } = useParams();
   const navigate = useNavigate();
   const location = useLocation();
-  const {
-    session,
-    items,
-    refresh,
-    renameThread,
-  } = useConversations();
+  const { session, items, refresh, renameThread } = useConversations();
   const [detail, setDetail] = useState<ConversationDetail | null>(null);
   const [draft, setDraft] = useState("");
   const [titleDraft, setTitleDraft] = useState("");
   const [busy, setBusy] = useState(false);
+  const [attachBusy, setAttachBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [attachment, setAttachment] = useState<AttachmentMeta | null>(null);
+  const [docOpen, setDocOpen] = useState(true);
   const bodyRef = useRef<HTMLDivElement>(null);
+  const fileRef = useRef<HTMLInputElement>(null);
+
+  const showDoc = Boolean(attachment && docOpen && session);
 
   useEffect(() => {
     if (!session) return;
@@ -106,9 +110,13 @@ export function ChatPage() {
         if (cancelled) return;
         setDetail(next);
         setTitleDraft(next.title);
+        const att = next.attachment ?? null;
+        setAttachment(att);
+        setDocOpen(Boolean(att));
       } catch (err) {
         if (!cancelled) {
           setDetail(null);
+          setAttachment(null);
           setError(err instanceof Error ? err.message : "No se pudo abrir el hilo.");
         }
       }
@@ -135,10 +143,11 @@ export function ChatPage() {
         profileId: session.profileId,
         conversationId,
         question: text,
-        documentId: getDocumentId(session.ownerId),
+        documentId: attachment?.documentId ?? getDocumentId(session.ownerId),
       });
       setDetail(next);
       setTitleDraft(next.title);
+      if (next.attachment) setAttachment(next.attachment);
       await refresh();
     } catch (err) {
       setError(err instanceof Error ? err.message : "No se pudo enviar.");
@@ -156,7 +165,6 @@ export function ChatPage() {
     sentPendingKeys.add(key);
     navigate(location.pathname, { replace: true, state: null });
     void send(pending);
-    // send is recreated each render; we only want this when pending arrives.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [conversationId, location.state, session]);
 
@@ -173,6 +181,28 @@ export function ChatPage() {
     } catch (err) {
       setError(err instanceof Error ? err.message : "No se pudo renombrar.");
       setTitleDraft(detail.title);
+    }
+  }
+
+  async function onAttach(file: File) {
+    if (!session || !conversationId) return;
+    setAttachBusy(true);
+    setError(null);
+    try {
+      const meta = await attachConversationFile({
+        ownerId: session.ownerId,
+        conversationId,
+        file,
+      });
+      setAttachment(meta);
+      setDocOpen(true);
+      const next = await fetchConversation(session.ownerId, conversationId);
+      setDetail(next);
+      await refresh();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "No se pudo adjuntar.");
+    } finally {
+      setAttachBusy(false);
     }
   }
 
@@ -200,6 +230,20 @@ export function ChatPage() {
                 }
               }}
             />
+            {attachment && (
+              <span className="thread-attach-chip">
+                · {attachment.fileName}
+                {!docOpen && (
+                  <button
+                    type="button"
+                    className="linkish"
+                    onClick={() => setDocOpen(true)}
+                  >
+                    mostrar
+                  </button>
+                )}
+              </span>
+            )}
           </div>
         </div>
         <div className="mono meta-steel">
@@ -209,73 +253,120 @@ export function ChatPage() {
         </div>
       </header>
 
-      <div className="page-body chat-body" ref={bodyRef}>
-        {error && <div className="inline-error">{error}</div>}
-        {detail && detail.messages.length === 0 && !busy && (
-          <p className="empty-thread">Este hilo está vacío. Preguntale al asesor.</p>
+      <div className={`chat-layout ${showDoc ? "is-1b" : "is-1a"}`}>
+        {showDoc && session && attachment && (
+          <DocumentPane
+            documentId={attachment.documentId}
+            ownerId={session.ownerId}
+            fileName={attachment.fileName}
+            mimeType={attachment.mimeType}
+            onClose={() => setDocOpen(false)}
+          />
         )}
-        {detail?.messages
-          .filter((m) => m.role !== "system")
-          .map((m) => (
-            <MessageBlock
-              key={m.id}
-              message={m}
-              ownerName={session?.ownerName ?? "Abraham"}
-              timezone={session?.timezone ?? "America/Costa_Rica"}
-            />
-          ))}
-        {busy && (
-          <div className="advisor-msg">
-            <div className="msg-meta">
-              <span className="brand-mark xs" />
-              <span className="fw600">Asesor Financiero</span>
-              <span className="mono meta-muted">escribiendo…</span>
-            </div>
-          </div>
-        )}
-      </div>
 
-      <div className="chat-composer-wrap">
-        <form
-          className="chat-composer"
-          onSubmit={(e) => {
-            e.preventDefault();
-            void send(draft);
-          }}
-        >
-          <div className="composer-field tall">
-            <textarea
-              className="composer-input"
-              name="q"
-              rows={2}
-              value={draft}
-              placeholder="Pregúntale al Asesor Financiero…"
-              disabled={busy || !conversationId}
-              onChange={(e) => setDraft(e.target.value)}
-              onKeyDown={(e) => {
-                if (e.key === "Enter" && !e.shiftKey) {
-                  e.preventDefault();
-                  void send(draft);
-                }
+        <div className="chat-layout-main">
+          <div className="page-body chat-body" ref={bodyRef}>
+            {error && <div className="inline-error">{error}</div>}
+            {detail &&
+              detail.messages.filter((m) => m.role !== "system").length === 0 &&
+              !busy && (
+                <p className="empty-thread">
+                  {attachment
+                    ? "Documento a la izquierda. Preguntale al asesor sobre él."
+                    : "Este hilo está vacío. Preguntale al asesor."}
+                </p>
+              )}
+            {detail?.messages
+              .filter((m) => m.role !== "system")
+              .map((m) => (
+                <MessageBlock
+                  key={m.id}
+                  message={m}
+                  ownerName={session?.ownerName ?? "Abraham"}
+                  timezone={session?.timezone ?? "America/Costa_Rica"}
+                />
+              ))}
+            {busy && (
+              <div className="advisor-msg">
+                <div className="msg-meta">
+                  <span className="brand-mark xs" />
+                  <span className="fw600">Asesor Financiero</span>
+                  <span className="mono meta-muted">escribiendo…</span>
+                </div>
+              </div>
+            )}
+          </div>
+
+          <div className="chat-composer-wrap">
+            <form
+              className="chat-composer"
+              onSubmit={(e) => {
+                e.preventDefault();
+                void send(draft);
               }}
-            />
-          </div>
-          <div className="composer-foot">
-            <div className="composer-hint">
-              <button type="button" className="attach-btn" title="Adjuntar archivo" disabled>
-                +
-              </button>
-              <span className="mono meta-muted">Habla con un asesor a la vez</span>
-            </div>
-            <button
-              type="submit"
-              className="btn btn-primary"
-              disabled={busy || !draft.trim() || !conversationId}
             >
-              Enviar
-            </button>
+              <div className="composer-field tall">
+                <textarea
+                  className="composer-input"
+                  name="q"
+                  rows={2}
+                  value={draft}
+                  placeholder={
+                    attachment
+                      ? "Preguntá sobre el documento adjunto…"
+                      : "Pregúntale al Asesor Financiero…"
+                  }
+                  disabled={busy || !conversationId}
+                  onChange={(e) => setDraft(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter" && !e.shiftKey) {
+                      e.preventDefault();
+                      void send(draft);
+                    }
+                  }}
+                />
+              </div>
+              <div className="composer-foot">
+                <div className="composer-hint">
+                  <button
+                    type="button"
+                    className="attach-btn"
+                    title="Adjuntar PDF o imagen"
+                    disabled={attachBusy || busy || !conversationId}
+                    onClick={() => fileRef.current?.click()}
+                  >
+                    +
+                  </button>
+                  <span className="mono meta-muted">
+                    {attachBusy
+                      ? "Subiendo…"
+                      : showDoc
+                        ? "Vista 1b · documento a la par"
+                        : "Habla con un asesor a la vez"}
+                  </span>
+                  <input
+                    ref={fileRef}
+                    type="file"
+                    accept="application/pdf,image/jpeg,image/png,.pdf,.jpg,.jpeg,.png"
+                    hidden
+                    onChange={(e) => {
+                      const file = e.target.files?.[0];
+                      e.target.value = "";
+                      if (file) void onAttach(file);
+                    }}
+                  />
+                </div>
+                <button
+                  type="submit"
+                  className="btn btn-primary"
+                  disabled={busy || !draft.trim() || !conversationId}
+                >
+                  Enviar
+                </button>
+              </div>
+            </form>
           </div>
-        </form>
+        </div>
       </div>
     </>
   );
