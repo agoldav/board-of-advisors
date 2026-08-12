@@ -47,6 +47,7 @@ import {
   type StoredStatus,
 } from "../commitments/stateMachine.js";
 import { tryHandleConversationRequest } from "./conversations.js";
+import { tryHandleRailRequest } from "./rail.js";
 import {
   attachChatDocument,
   AttachUploadError,
@@ -495,6 +496,16 @@ export async function handleRequest(
         return;
       }
     }
+
+    const claimedRail = await tryHandleRailRequest({
+      req,
+      res,
+      pathname,
+      ownerFrom,
+      readJson,
+      sendJson,
+    });
+    if (claimedRail) return;
 
     const claimedConversation = await tryHandleConversationRequest({
       req,

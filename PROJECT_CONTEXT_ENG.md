@@ -776,13 +776,30 @@ change the architecture if deferred past it. Decide before the product is sold.
 
 ---
 
+**Session 2026-08-12 — Create advisor / section + drag**
+
+**Pending item 4.** Owner-created advisors and sections in the rail, ⋮ menu, and DnD.
+
+**How (no migration / no schema `0001` or `askAdvisor` change):**
+- Rail node = conversation + `system` message `__boa_rail_v1__` (kind, parentId, sortOrder, archived, advisorId).
+- `GET/POST /api/rail`, `PATCH/DELETE /api/rail/nodes/:id` — list, create advisor/section/thread, rename, archive, move/nest, delete (children reparented).
+- First load ensures a **Financial Advisor** and hangs orphan threads under it.
+- UI: Create new advisor / Create new section; ⋮ → Rename / Archive / Delete / Create Sub; drag to reorder or nest.
+- Compromisos and Documentos stay fixed product routes, not deletable tree nodes.
+
+**Verification:** 84 tests green; typecheck + web build clean.
+
+---
+
 ### ⏳ Pending
 
 **UI build — agreed order (2026-08-10):**
-1. **Create advisor / Create section + drag to nest**, including:
-   - Active Create new advisor / Create new section controls.
-   - ⋮ menu on each advisor and section: **Rename**, **Archive**, **Delete**, **Create Sub** (new section/chat inside the advisor or section).
-   - Drag to move and nest all advisors and sections.
+1. ~~Chat threads in DB (D-039)~~ — done
+2. ~~Paragraph comments~~ — done
+3. ~~Document view 1b~~ — done
+4. ~~Create advisor / Create section + drag~~ — done 2026-08-12
+
+*(Agreed 2026-08-10 UI queue is empty.)*
 
 **Deferred to v2:**
 - Nightly digest (Batch API)
@@ -794,4 +811,4 @@ change the architecture if deferred past it. Decide before the product is sold.
 
 ---
 
-**Last Updated:** 2026-08-12 (session close: items 2–3 on main; item 4 pending)
+**Last Updated:** 2026-08-12 (item 4: create advisor/section + DnD)
