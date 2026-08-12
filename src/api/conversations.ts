@@ -11,11 +11,17 @@ import {
   deleteConversation,
   exportConversation,
   getConversation,
+  getOrCreateParagraphThread,
   importConversation,
   listConversations,
   maybeAutotitle,
   renameConversation,
+  rewriteUserMessageContent,
 } from "../conversations/service.js";
+import {
+  buildParagraphModelPrompt,
+  parseAnchor,
+} from "../conversations/anchors.js";
 import { InvalidConversationExportError } from "../conversations/export.js";
 import { getConfirmedFiguresForAdvice } from "../documents/service.js";
 
@@ -71,6 +77,40 @@ export async function tryHandleConversationRequest(args: {
       return true;
     }
 
+    if (pathname === "/api/conversations/paragraph" && req.method === "POST") {
+      const body = (await readJson(req)) as Record<string, unknown>;
+      const ownerId = ownerFrom(req, body);
+      const sectionKey = String(body.sectionKey ?? "").trim();
+      const sectionTitle = String(body.sectionTitle ?? sectionKey).trim();
+      const excerpt = String(body.excerpt ?? "").trim();
+      if (!sectionKey || !excerpt) {
+        sendJson(res, 400, { error: "sectionKey and excerpt are required" });
+        return true;
+      }
+      const parentConversationId =
+        typeof body.parentConversationId === "string" &&
+        body.parentConversationId.trim()
+          ? body.parentConversationId.trim()
+          : undefined;
+      const source =
+        body.source === "chat" || body.source === "first_reading"
+          ? body.source
+          : "first_reading";
+      const item = await getOrCreateParagraphThread({
+        ownerId,
+        anchor: {
+          kind: "paragraph",
+          sectionKey,
+          sectionTitle: sectionTitle || sectionKey,
+          excerpt,
+          source,
+          ...(parentConversationId ? { parentConversationId } : {}),
+        },
+      });
+      sendJson(res, 201, { ok: true, item });
+      return true;
+    }
+
     if (pathname === "/api/conversations/import" && req.method === "POST") {
       const body = (await readJson(req)) as Record<string, unknown>;
       const ownerId = ownerFrom(req, body);
@@ -107,6 +147,18 @@ export async function tryHandleConversationRequest(args: {
         }
         await getConversation(ownerId, m.id!);
 
+        const detailBefore = await getConversation(ownerId, m.id!);
+        const anchorMsg = detailBefore.messages.find(
+          (msg) => msg.role === "system" && parseAnchor(msg.content),
+        );
+        const anchor = anchorMsg ? parseAnchor(anchorMsg.content) : null;
+        const priorTurns = detailBefore.messages
+          .filter((msg) => msg.role === "user" || msg.role === "assistant")
+          .map((msg) => ({
+            role: msg.role as "user" | "assistant",
+            content: msg.content,
+          }));
+
         let dataSnapshot: unknown = {};
         const documentId =
           typeof body.documentId === "string" ? body.documentId.trim() : "";
@@ -117,21 +169,59 @@ export async function tryHandleConversationRequest(args: {
             dataSnapshot = {};
           }
         }
+        if (anchor) {
+          dataSnapshot = {
+            ...(typeof dataSnapshot === "object" && dataSnapshot
+              ? (dataSnapshot as object)
+              : {}),
+            paragraphAnchor: anchor,
+          };
+        }
+
+        const modelQuestion = anchor
+          ? buildParagraphModelPrompt({
+              anchor,
+              question,
+              priorTurns,
+            })
+          : priorTurns.length > 0
+            ? [
+                ...priorTurns.map((t) =>
+                  t.role === "user"
+                    ? `Dueño: ${t.content}`
+                    : `Asesor: ${t.content}`,
+                ),
+                `Dueño: ${question}`,
+              ].join("\n\n")
+            : question;
 
         const result = await askAdvisor({
           ownerId,
           profileId,
           conversationId: m.id!,
           advisorId,
-          question,
+          question: modelQuestion,
           dataSnapshot,
           saveAsRecommendation: false,
         });
-        await maybeAutotitle({
-          ownerId,
-          conversationId: m.id!,
-          question,
-        });
+
+        // Keep the stored user bubble as the short question the owner typed
+        // (askAdvisor persists the full model prompt otherwise).
+        if (modelQuestion !== question) {
+          await rewriteUserMessageContent({
+            ownerId,
+            messageId: result.userMessageId,
+            content: question,
+          });
+        }
+
+        if (!anchor) {
+          await maybeAutotitle({
+            ownerId,
+            conversationId: m.id!,
+            question,
+          });
+        }
         const item = await getConversation(ownerId, m.id!);
         sendJson(res, 201, { ok: true, item, ...result });
         return true;

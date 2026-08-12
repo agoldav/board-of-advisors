@@ -1125,10 +1125,19 @@
   padding: 5px 9px;
   margin: -5px -9px;
 }
+.paragraph-thread {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 14px;
+  max-width: 860px;
+}
+.composer-error {
+  padding: 0 16px 8px;
+}
 .is-lede .prose-hit {
   font-size: 16px;
   line-height: 1.65;
-  cursor: default;
 }
 .reading-figure {
   display: flex;

@@ -3,12 +3,18 @@ import { useNavigate } from "react-router-dom";
 import {
   acceptCommitment,
   ensureClientSession,
+  ensureParagraphThread,
   fetchConfirmation,
   formatUsd,
   getDocumentId,
+  sendConversationMessage,
   streamFirstReading,
+  type ConversationDetail,
+  type ConversationMessage,
   type FigureRow,
 } from "../api/client";
+import { InlineComposer } from "../components/InlineComposer";
+import { useConversations } from "../conversations/context";
 import { composition } from "../data/fixtures";
 
 type SectionMeta = {
@@ -161,6 +167,7 @@ function filterFigures(
 
 export function FirstReadingPage() {
   const navigate = useNavigate();
+  const { refresh: refreshThreads } = useConversations();
   const [reading, setReading] = useState("");
   const [figures, setFigures] = useState<FigureRow[]>([]);
   const [busy, setBusy] = useState(true);
@@ -174,6 +181,15 @@ export function FirstReadingPage() {
   const [activeSection, setActiveSection] = useState("lede");
   const [asideKind, setAsideKind] = useState<AsideKind>("figure");
   const [asideOpen, setAsideOpen] = useState(true);
+  const [commentOpen, setCommentOpen] = useState(false);
+  const [parentConversationId, setParentConversationId] = useState<string | null>(
+    null,
+  );
+  const [paragraphThread, setParagraphThread] = useState<ConversationDetail | null>(
+    null,
+  );
+  const [commentBusy, setCommentBusy] = useState(false);
+  const [commentError, setCommentError] = useState<string | null>(null);
 
   useEffect(() => {
     let cancelled = false;
@@ -182,6 +198,7 @@ export function FirstReadingPage() {
         setBusy(true);
         setError(null);
         const session = await ensureClientSession();
+        if (!cancelled) setParentConversationId(session.conversationId);
         const documentId = getDocumentId(session.ownerId);
         if (!documentId) {
           navigate("/cifras");
@@ -233,6 +250,81 @@ export function FirstReadingPage() {
     return filterFigures(figures, active.meta.tableSections, active.meta.id);
   }, [active, figures]);
 
+  const visibleThreadMessages = useMemo(() => {
+    if (!paragraphThread) return [] as ConversationMessage[];
+    return paragraphThread.messages.filter(
+      (m) => m.role === "user" || m.role === "assistant",
+    );
+  }, [paragraphThread]);
+
+  async function loadParagraphThread(sec: ReadingSection) {
+    const session = await ensureClientSession();
+    const excerpt = sec.prose.trim();
+    if (!excerpt) return;
+    const item = await ensureParagraphThread({
+      ownerId: session.ownerId,
+      sectionKey: sec.id,
+      sectionTitle: sec.title ?? "Introducción",
+      excerpt,
+      parentConversationId: parentConversationId ?? session.conversationId,
+      source: "first_reading",
+    });
+    setParagraphThread(item);
+    await refreshThreads();
+  }
+
+  async function openAside(sectionId: string, kind: AsideKind) {
+    setActiveSection(sectionId);
+    setAsideKind(kind);
+    setAsideOpen(true);
+    setCommentOpen(true);
+    setCommentError(null);
+    const sec = sections.find((s) => s.id === sectionId);
+    if (!sec) return;
+    try {
+      await loadParagraphThread(sec);
+    } catch (err) {
+      setCommentError(
+        err instanceof Error ? err.message : "No se pudo abrir el hilo del párrafo.",
+      );
+    }
+  }
+
+  async function onCommentSubmit(text: string) {
+    if (!active) return;
+    setCommentBusy(true);
+    setCommentError(null);
+    try {
+      const session = await ensureClientSession();
+      let thread = paragraphThread;
+      if (!thread || thread.anchor?.sectionKey !== active.id) {
+        await loadParagraphThread(active);
+        thread = await ensureParagraphThread({
+          ownerId: session.ownerId,
+          sectionKey: active.id,
+          sectionTitle: active.title ?? "Introducción",
+          excerpt: active.prose.trim(),
+          parentConversationId: parentConversationId ?? session.conversationId,
+          source: "first_reading",
+        });
+      }
+      const next = await sendConversationMessage({
+        ownerId: session.ownerId,
+        profileId: session.profileId,
+        conversationId: thread.id,
+        question: text,
+        documentId: getDocumentId(session.ownerId),
+      });
+      setParagraphThread(next);
+      await refreshThreads();
+    } catch (err) {
+      setCommentError(err instanceof Error ? err.message : "No se pudo enviar.");
+      throw err;
+    } finally {
+      setCommentBusy(false);
+    }
+  }
+
   async function onAccept() {
     if (!recommendationId) return;
     setBusy(true);
@@ -254,10 +346,17 @@ export function FirstReadingPage() {
     }
   }
 
-  function openAside(sectionId: string, kind: AsideKind) {
-    setActiveSection(sectionId);
-    setAsideKind(kind);
-    setAsideOpen(true);
+  function formatWhen(iso: string): string {
+    try {
+      return new Date(iso).toLocaleString("es-CR", {
+        day: "numeric",
+        month: "short",
+        hour: "2-digit",
+        minute: "2-digit",
+      });
+    } catch {
+      return iso;
+    }
   }
 
   return (
@@ -308,7 +407,7 @@ export function FirstReadingPage() {
                     <button
                       type="button"
                       className={`prose-hit ${isActive ? "is-selected" : ""}`}
-                      onClick={() => openAside(sec.id, hasFigure ? "figure" : "table")}
+                      onClick={() => void openAside(sec.id, hasFigure ? "figure" : "table")}
                       dangerouslySetInnerHTML={{ __html: renderProseHtml(sec.prose) }}
                     />
                     {(hasFigure || hasTable || hasChart) && (
@@ -319,7 +418,7 @@ export function FirstReadingPage() {
                             className={`mono evidence-chip ${
                               isActive && asideKind === "figure" ? "is-on" : ""
                             }`}
-                            onClick={() => openAside(sec.id, "figure")}
+                            onClick={() => void openAside(sec.id, "figure")}
                           >
                             Cifra
                           </button>
@@ -330,7 +429,7 @@ export function FirstReadingPage() {
                             className={`mono evidence-chip ${
                               isActive && asideKind === "table" ? "is-on" : ""
                             }`}
-                            onClick={() => openAside(sec.id, "table")}
+                            onClick={() => void openAside(sec.id, "table")}
                           >
                             Tabla
                           </button>
@@ -341,11 +440,60 @@ export function FirstReadingPage() {
                             className={`mono evidence-chip ${
                               isActive && asideKind === "chart" ? "is-on" : ""
                             }`}
-                            onClick={() => openAside(sec.id, "chart")}
+                            onClick={() => void openAside(sec.id, "chart")}
                           >
                             Gráfica
                           </button>
                         )}
+                      </div>
+                    )}
+
+                    {isActive && commentOpen && (
+                      <div className="paragraph-thread">
+                        {visibleThreadMessages.map((m) => (
+                          <div
+                            key={m.id}
+                            className={
+                              m.role === "user"
+                                ? "owner-msg compact"
+                                : "advisor-msg"
+                            }
+                          >
+                            <div className="msg-meta">
+                              {m.role === "assistant" && (
+                                <span className="brand-mark xs" />
+                              )}
+                              <span className="fw600">
+                                {m.role === "user" ? "Abraham" : "Asesor Financiero"}
+                              </span>
+                              <span className="mono meta-muted">
+                                {formatWhen(m.createdAt)}
+                              </span>
+                            </div>
+                            {m.content
+                              .split(/\n{2,}/)
+                              .map((p) => p.trim())
+                              .filter(Boolean)
+                              .map((p, i) => (
+                                <p key={i}>{p}</p>
+                              ))}
+                          </div>
+                        ))}
+                        <InlineComposer
+                          eyebrow={`Sobre este párrafo · ${sec.title ?? "Introducción"}`}
+                          placeholder={
+                            sec.meta.caption
+                              ? `Pregunta o comenta sobre ${sec.meta.caption.toLowerCase()}…`
+                              : "Pregunta o comenta sobre este párrafo…"
+                          }
+                          busy={commentBusy}
+                          error={commentError}
+                          onClose={() => {
+                            setCommentOpen(false);
+                            setCommentError(null);
+                          }}
+                          onSubmit={onCommentSubmit}
+                        />
                       </div>
                     )}
                   </div>
@@ -410,7 +558,7 @@ export function FirstReadingPage() {
                   <button
                     type="button"
                     className="mono evidence-chip aside-reopen"
-                    onClick={() => openAside(active.id, "chart")}
+                    onClick={() => void openAside(active.id, "chart")}
                     disabled={!active.meta.chart}
                     hidden={!active.meta.chart}
                   >

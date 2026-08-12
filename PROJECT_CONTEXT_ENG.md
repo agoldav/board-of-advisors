@@ -746,11 +746,23 @@ change the architecture if deferred past it. Decide before the product is sold.
 
 ---
 
+**Session 2026-08-12 — Paragraph comments**
+
+**Pending item 2.** Thread anchored to a first-reading paragraph; owner can keep asking.
+
+**How (no migration, no `askAdvisor` change):**
+- Anchor = `system` message with `__boa_anchor_v1__` + JSON (section, excerpt, parent).
+- `POST /api/conversations/paragraph` — find-or-create by `(owner, parent, sectionKey)`.
+- On send, API builds prompt with excerpt + history; DB stores only the short question.
+- UI: selecting a paragraph on `/lectura` opens the inline composer; replies stay in-thread; rail nests `Sobre: …` under the parent.
+
+---
+
 ### ⏳ Pending
 
 **UI build — agreed order (2026-08-10):**
 1. ~~Chat threads in DB (D-039)~~ — done 2026-08-11
-2. Paragraph comment (anchored thread; owner can keep asking about that paragraph)
+2. ~~Paragraph comment~~ — done 2026-08-12
 3. Document view **1b** when attaching PDF/JPG/etc. (document beside advisor; 1a = data/chat)
 4. Create advisor / Create section + drag to nest
 
@@ -764,4 +776,4 @@ change the architecture if deferred past it. Decide before the product is sold.
 
 ---
 
-**Last Updated:** 2026-08-11 (chat threads in DB)
+**Last Updated:** 2026-08-12 (paragraph comments)
