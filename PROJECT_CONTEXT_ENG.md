@@ -758,12 +758,23 @@ change the architecture if deferred past it. Decide before the product is sold.
 
 ---
 
+**Session 2026-08-12 — Document view 1b (chat attachment)**
+
+**Pending item 3.** Attaching PDF/JPG/PNG in chat switches to **1b**: document left, advisor right (1a = chat/data only).
+
+**How (no schema change, no financial extraction path):**
+- `POST /api/conversations/:id/attachments` stores bytes in `documents` (`kind=other`) + system message `__boa_attachment_v1__`.
+- `GET /api/documents/:id/file?ownerId=` serves the original for iframe/img.
+- Chat `+` button enables attach; opens `DocumentPane`; can close/reopen.
+
+---
+
 ### ⏳ Pending
 
 **UI build — agreed order (2026-08-10):**
 1. ~~Chat threads in DB (D-039)~~ — done 2026-08-11
 2. ~~Paragraph comment~~ — done 2026-08-12
-3. Document view **1b** when attaching PDF/JPG/etc. (document beside advisor; 1a = data/chat)
+3. ~~Document view 1b~~ — done 2026-08-12
 4. Create advisor / Create section + drag to nest
 
 **Deferred to v2:**
@@ -776,4 +787,4 @@ change the architecture if deferred past it. Decide before the product is sold.
 
 ---
 
-**Last Updated:** 2026-08-12 (paragraph comments)
+**Last Updated:** 2026-08-12 (document view 1b)

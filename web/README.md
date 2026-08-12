@@ -29,7 +29,7 @@ Open http://127.0.0.1:5173. Vite proxies `/api` → `:8787`.
 
 ## Notes
 
-- Pixel direction follows **1a** (persistent left rail). Direction 1b is not built.
+- Pixel direction follows **1a** (persistent left rail). Direction **1b** (document beside advisor) activates when attaching PDF/JPG/PNG in chat.
 - Golden path (cifras → lectura → compromisos) is wired to the API with **MockLlmProvider** until an Anthropic key is set.
 - Theme toggle (claro/oscuro) sits in the rail footer.
 - Labels that mix English/Spanish in the rail are intentional (per design handoff).

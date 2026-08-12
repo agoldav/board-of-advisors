@@ -13,6 +13,10 @@ import {
   type ParagraphAnchor,
 } from "./anchors.js";
 import {
+  latestAttachmentFromMessages,
+  type AttachmentMeta,
+} from "../documents/attach.js";
+import {
   parseConversationExport,
   serializeConversationExport,
   titleFromQuestion,
@@ -54,6 +58,7 @@ export type ConversationMessage = {
 
 export type ConversationDetail = ConversationSummary & {
   messages: ConversationMessage[];
+  attachment: AttachmentMeta | null;
 };
 
 const DEFAULT_TITLE = "Nuevo hilo";
@@ -181,6 +186,7 @@ export async function getConversation(
     lastActivityAt: (last?.created_at ?? conv.created_at).toISOString(),
     messageCount: messages.length,
     anchor: anchorMsg ? parseAnchor(anchorMsg.content) : null,
+    attachment: latestAttachmentFromMessages(mapped),
     messages: mapped,
   };
 }

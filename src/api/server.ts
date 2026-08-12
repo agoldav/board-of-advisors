@@ -47,6 +47,12 @@ import {
   type StoredStatus,
 } from "../commitments/stateMachine.js";
 import { tryHandleConversationRequest } from "./conversations.js";
+import {
+  attachChatDocument,
+  AttachUploadError,
+  loadDocumentFile,
+  parseAttachFilename,
+} from "../documents/attach.js";
 
 async function readBodyBuffer(req: IncomingMessage): Promise<Buffer> {
   const chunks: Buffer[] = [];
@@ -90,6 +96,9 @@ function ownerFrom(req: IncomingMessage, body?: Record<string, unknown>): string
   if (typeof header === "string" && header.trim()) return header.trim();
   const fromBody = body?.ownerId;
   if (typeof fromBody === "string" && fromBody.trim()) return fromBody.trim();
+  const url = new URL(req.url ?? "/", "http://localhost");
+  const fromQuery = url.searchParams.get("ownerId");
+  if (fromQuery?.trim()) return fromQuery.trim();
   const env = process.env.OWNER_ID?.trim();
   if (env) return env;
   throw new Error("Missing ownerId (header X-Owner-Id, body.ownerId, or OWNER_ID).");
@@ -265,6 +274,46 @@ export async function handleRequest(
         source: "upload",
       });
       return;
+    }
+
+    // --- Chat attachment (view 1b: document beside advisor) ---
+    {
+      const m = match(pathname, "/api/conversations/:id/attachments");
+      if (m && req.method === "POST") {
+        const ownerId = ownerFrom(req);
+        const fileName = parseAttachFilename(req.headers["x-filename"]);
+        const bytes = await readBodyBuffer(req);
+        const meta = await attachChatDocument({
+          ownerId,
+          conversationId: m.id!,
+          bytes,
+          fileName,
+        });
+        sendJson(res, 201, { ok: true, attachment: meta });
+        return;
+      }
+    }
+
+    // --- Serve stored original file bytes ---
+    {
+      const m = match(pathname, "/api/documents/:id/file");
+      if (m && req.method === "GET") {
+        const ownerId = ownerFrom(req);
+        const file = await loadDocumentFile(ownerId, m.id!);
+        if (!file) {
+          sendJson(res, 404, { error: "Document file not found" });
+          return;
+        }
+        cors(res);
+        res.writeHead(200, {
+          "content-type": file.mimeType,
+          "content-length": file.bytes.length,
+          "content-disposition": `inline; filename*=UTF-8''${encodeURIComponent(file.fileName)}`,
+          "cache-control": "private, max-age=60",
+        });
+        res.end(file.bytes);
+        return;
+      }
     }
 
     // --- Confirmation view ---
@@ -480,6 +529,10 @@ export async function handleRequest(
       return;
     }
     if (err instanceof PdfUploadError) {
+      sendJson(res, err.status, { error: err.message });
+      return;
+    }
+    if (err instanceof AttachUploadError) {
       sendJson(res, err.status, { error: err.message });
       return;
     }

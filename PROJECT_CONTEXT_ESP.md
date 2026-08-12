@@ -782,12 +782,23 @@ vender el producto.
 
 ---
 
+**Sesión 2026-08-12 — Vista documento 1b (adjunto en chat)**
+
+**Ítem 3 de Pendiente.** Al adjuntar PDF/JPG/PNG en el chat, el layout pasa a **1b**: documento a la izquierda, asesor a la derecha (1a = solo chat/datos).
+
+**Cómo (sin tocar schema ni extracción financiera):**
+- `POST /api/conversations/:id/attachments` guarda bytes en `documents` (`kind=other`) + mensaje system `__boa_attachment_v1__`.
+- `GET /api/documents/:id/file?ownerId=` sirve el original (para iframe/img).
+- Chat: botón `+` habilita adjunto; abre panel `DocumentPane`; se puede cerrar y reabrir.
+
+---
+
 ### ⏳ Pendiente
 
 **Construcción UI — orden acordado (2026-08-10):**
 1. ~~Hilos de chat en BD (D-039)~~ — hecho 2026-08-11
 2. ~~Comentario por párrafo~~ — hecho 2026-08-12
-3. Vista documento **1b** al adjuntar PDF/JPG/etc. (documento a la par del asesor; 1a = datos/chat)
+3. ~~Vista documento 1b~~ — hecho 2026-08-12
 4. Create advisor / Create section + arrastrar para anidar
 
 **Diferidos a v2:**
@@ -800,4 +811,4 @@ vender el producto.
 
 ---
 
-**Última actualización:** 2026-08-12 (comentario por párrafo)
+**Última actualización:** 2026-08-12 (vista documento 1b)
