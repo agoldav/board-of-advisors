@@ -538,6 +538,80 @@ export async function importConversationApi(
   return data.item;
 }
 
+export type RailKind = "advisor" | "section" | "thread";
+
+export type RailNode = {
+  id: string;
+  title: string;
+  kind: RailKind;
+  parentId: string | null;
+  sortOrder: number;
+  archived: boolean;
+  advisorId: string | null;
+  messageCount: number;
+  createdAt: string;
+  lastActivityAt: string;
+  anchor: ParagraphAnchor | null;
+};
+
+export async function fetchRail(ownerId: string): Promise<RailNode[]> {
+  const data = await api<{ ok: boolean; items: RailNode[] }>("/api/rail", {
+    method: "GET",
+    ownerId,
+  });
+  return data.items;
+}
+
+export async function createRailNodeApi(args: {
+  ownerId: string;
+  kind: RailKind;
+  title?: string;
+  parentId?: string | null;
+  advisorId?: string;
+}): Promise<RailNode> {
+  const data = await api<{ ok: boolean; item: RailNode }>("/api/rail/nodes", {
+    method: "POST",
+    ownerId: args.ownerId,
+    body: JSON.stringify(args),
+  });
+  return data.item;
+}
+
+export async function patchRailNodeApi(args: {
+  ownerId: string;
+  nodeId: string;
+  title?: string;
+  archived?: boolean;
+  parentId?: string | null;
+  index?: number;
+}): Promise<{ item?: RailNode; items?: RailNode[] }> {
+  const body: Record<string, unknown> = { ownerId: args.ownerId };
+  if (typeof args.title === "string") body.title = args.title;
+  if (typeof args.archived === "boolean") body.archived = args.archived;
+  if ("parentId" in args) body.parentId = args.parentId ?? null;
+  if (typeof args.index === "number") body.index = args.index;
+  const data = await api<{ ok: boolean; item?: RailNode; items?: RailNode[] }>(
+    `/api/rail/nodes/${args.nodeId}`,
+    {
+      method: "PATCH",
+      ownerId: args.ownerId,
+      body: JSON.stringify(body),
+    },
+  );
+  return data;
+}
+
+export async function deleteRailNodeApi(
+  ownerId: string,
+  nodeId: string,
+): Promise<RailNode[]> {
+  const data = await api<{ ok: boolean; items: RailNode[] }>(
+    `/api/rail/nodes/${nodeId}`,
+    { method: "DELETE", ownerId },
+  );
+  return data.items;
+}
+
 export async function ensureParagraphThread(args: {
   ownerId: string;
   sectionKey: string;
