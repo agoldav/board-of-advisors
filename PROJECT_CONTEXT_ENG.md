@@ -791,6 +791,27 @@ change the architecture if deferred past it. Decide before the product is sold.
 
 ---
 
+**Session 2026-08-29 — Rail polish (item 4): reorder, collapse, relative time**
+
+**Branch:** `feature/rail-create-advisor-section-dnd` (PR #5).
+
+**Left rail UI:**
+- One card per advisor; resizable rail (200–480 px, persisted in localStorage).
+- Collapse/expand (▼) on advisors, sections, and threads.
+- Create advisor / section / thread with instant on-screen placeholder (optimistic UI) and faster server response on create.
+- Reorder advisors: drag the ⠿ grip, orange line between cards follows the cursor, release to place; UI updates immediately (API syncs in background).
+- Relative time since last interaction on every thread and sub line (`1m`, `3h`, `6d`…); on the advisor header only when that tab is collapsed (shows the newest activity in the subtree).
+
+**Chat:**
+- Composer spans full width; Send button and footer hint no longer clipped.
+
+**Backend (no schema change):**
+- `createRailNode` optimized: no full-tree reload after each create.
+
+**Verification:** web build clean.
+
+---
+
 ### ⏳ Pending
 
 **UI build — agreed order (2026-08-10):**
@@ -811,4 +832,4 @@ change the architecture if deferred past it. Decide before the product is sold.
 
 ---
 
-**Last Updated:** 2026-08-12 (item 4: create advisor/section + DnD)
+**Last Updated:** 2026-08-29 (rail polish: reorder, collapse, relative time, chat composer)

@@ -815,6 +815,27 @@ vender el producto.
 
 ---
 
+**Sesión 2026-08-29 — Pulido del rail (ítem 4): reordenar, colapsar, tiempos**
+
+**Rama:** `feature/rail-create-advisor-section-dnd` (PR #5).
+
+**UI del rail izquierdo:**
+- Cada advisor en su propia tarjeta; rail redimensionable (200–480 px, guardado en local).
+- Colapsar/expandir (▼) en advisors, secciones e hilos.
+- Crear advisor / sección / hilo con aparición inmediata en pantalla (optimista) y respuesta más rápida del servidor al crear.
+- Reordenar advisors: agarrar el ⠿, línea naranja entre tarjetas donde va el cursor, soltar para colocar; el cambio se ve al instante.
+- Tiempo desde la última interacción en cada línea de hilo y sub (`1m`, `3h`, `6d`…); en la línea del advisor solo si el tab está colapsado (muestra la actividad más reciente del árbol).
+
+**Chat:**
+- Cuadro de escritura a ancho completo; ya no se corta “Enviar” ni el texto de abajo.
+
+**Backend (sin cambio de schema):**
+- `createRailNode` optimizado: no vuelve a listar todo el árbol tras cada creación.
+
+**Verificación:** `web` build limpio.
+
+---
+
 ### ⏳ Pendiente
 
 **Construcción UI — orden acordado (2026-08-10):**
@@ -835,4 +856,4 @@ vender el producto.
 
 ---
 
-**Última actualización:** 2026-08-12 (ítem 4: create advisor/section + DnD)
+**Última actualización:** 2026-08-29 (pulido rail: reordenar, colapsar, tiempos relativos, chat)

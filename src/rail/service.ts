@@ -315,6 +315,11 @@ export async function ensureRailTree(ownerId: string): Promise<RailNode[]> {
   return final.nodes.sort(compareNodes);
 }
 
+async function readRailNodes(ownerId: string): Promise<RailNode[]> {
+  const { nodes } = await snapshot(ownerId);
+  return nodes.sort(compareNodes);
+}
+
 export async function listRailNodes(ownerId: string): Promise<RailNode[]> {
   return ensureRailTree(ownerId);
 }
@@ -326,15 +331,19 @@ export async function createRailNode(args: {
   parentId?: string | null;
   advisorId?: string;
 }): Promise<RailNode> {
-  const nodes = await ensureRailTree(args.ownerId);
   const parentId = args.parentId ?? null;
 
   if (parentId) {
-    const parent = nodes.find((n) => n.id === parentId && !n.archived);
-    if (!parent) {
+    const { rows } = await getPool().query<{ id: string }>(
+      `SELECT id FROM conversations WHERE id = $1 AND owner_id = $2`,
+      [parentId, args.ownerId],
+    );
+    if (!rows[0]) {
       throw new RailValidationError("El padre no existe o está archivado.");
     }
   }
+
+  const nodes = await readRailNodes(args.ownerId);
 
   const title =
     args.title?.trim() ||
@@ -378,10 +387,20 @@ export async function createRailNode(args: {
     return conversationId;
   });
 
-  const list = await listRailNodes(args.ownerId);
-  const created = list.find((n) => n.id === id);
-  if (!created) throw new Error("Failed to create rail node.");
-  return created;
+  const now = new Date().toISOString();
+  return {
+    id,
+    title: displayTitle(title),
+    kind: args.kind,
+    parentId,
+    sortOrder,
+    archived: false,
+    advisorId: persona ?? null,
+    messageCount: 0,
+    createdAt: now,
+    lastActivityAt: now,
+    anchor: null,
+  };
 }
 
 export async function renameRailNode(args: {
