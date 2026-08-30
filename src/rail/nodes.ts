@@ -12,7 +12,11 @@ export type RailMeta = {
   parentId: string | null;
   sortOrder: number;
   archived: boolean;
-  /** YAML advisor persona id when kind=advisor (or preferred for a thread). */
+  /** Preset slug (financiero, mercadeo, …) or "custom" (D-040). */
+  expertType?: string;
+  /** Owner-defined role for custom advisors (D-041). */
+  customRole?: string;
+  /** @deprecated Legacy alias for expertType on preset advisors. */
   advisorId?: string;
 };
 
@@ -42,6 +46,16 @@ export function parseRailMeta(content: string): RailMeta | null {
       sortOrder,
       archived: Boolean(obj.archived),
     };
+    const expertType =
+      typeof obj.expertType === "string" && obj.expertType.trim()
+        ? obj.expertType.trim()
+        : typeof obj.advisorId === "string" && obj.advisorId.trim()
+          ? obj.advisorId.trim()
+          : undefined;
+    if (expertType) meta.expertType = expertType;
+    if (typeof obj.customRole === "string" && obj.customRole.trim()) {
+      meta.customRole = obj.customRole.trim();
+    }
     if (typeof obj.advisorId === "string" && obj.advisorId.trim()) {
       meta.advisorId = obj.advisorId.trim();
     }

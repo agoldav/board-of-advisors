@@ -146,6 +146,10 @@ defensive against bad actors rather than predatory. Question: is the risk worth 
 | D-037 | 2026-08-08 | **Extract every line item from financial statements on the first pass, not just totals.** | Use Case C is a line-item question. Extracting summaries only would force a full PDF re-send on the product's most important query, at ~10× the cost. |
 | D-038 | 2026-08-08 | **The first read streams to the screen.** | It can take minutes. A spinner that long reads as a hang and the owner reloads. |
 | D-039 | 2026-08-10 | **Chat threads (and paragraph comments) live in the app DB**, same as commitments. File export/import to a local folder is optional backup, not the source of truth. | Browser cache gets cleared; watching a disk folder is fragile (permissions, paths, browsers can't do it well). Confirmed by the owner. |
+| D-040 | 2026-08-29 | **The name the owner assigns to an advisor card on the rail IS the expert identity that responds.** No hidden persona separate from the card title. Seven preset types: Financiero, Mercadeo, Operaciones, Ventas, PM, IT, Legal. From the eighth onward: free name = custom advisor. | Owner correction. The card≠persona model (finance/operations in YAML) contradicted the product: the owner names the expert, not decorates a system persona. |
+| D-041 | 2026-08-29 | **Custom advisors: on first chat, the owner describes what the advisor should do.** That description is stored on the rail node and defines the role until the owner edits it. | Without onboarding, a free name is not enough to instruct the model. One question when opening the first thread under that advisor. |
+| D-042 | 2026-08-29 | **Book/doc knowledge in two levels.** Level 1 (default): answer from distilled knowledge uploaded offline (not on every question). Level 2 (opt-in): if memory is insufficient, the advisor warns, estimates token/dollar cost, and **asks for confirmation** before searching the book index (chapter → section). Never search without consent. | Owner wants “from memory” answers, not RAG on every query; but wants depth on demand with cost transparency. Aligned with D-032 (spend visibility). |
+| D-043 | 2026-08-29 | **Knowledge feed pipeline (future):** ingest → chunk + hierarchical index → distillation per `expertType` → cacheable version in the advisor delta. Deep search (Level 2) reads only relevant chapters/sections, never the full corpus. | Token efficiency: whole books processed once; at runtime only distilled + bounded retrieval with a cap. |
 
 ---
 
@@ -812,6 +816,27 @@ change the architecture if deferred past it. Decide before the product is sold.
 
 ---
 
+**Session 2026-08-29 — Seven experts, ghost chat, and regenerate**
+
+**Advisor model (D-040–D-041):**
+- Seven preset experts in YAML: Financiero, Mercadeo, Operaciones, Ventas, PM, IT, Legal (`src/advisors/presets.ts` + `configs/*.yaml`).
+- The rail card title **is** the expert identity; chat resolves the expert by walking the rail tree (`resolveAdvisor`), with no “switch persona” picker.
+- On rail load, all seven preset cards are ensured; reconciliation prevents duplicates and backfills `expertType`.
+- Custom advisors (8+): first chat asks for a role description; stored on the rail node until the owner edits it.
+- `GET /api/advisors` lists available expert types.
+
+**Rail UX:**
+- Delete confirmation appears next to the cursor (custom popover), not the browser’s centered dialog.
+
+**Chat:**
+- Advisor replies with readable formatting (larger text, bold, accent on amounts and percentages).
+- Edit an owner question and regenerate the advisor reply (`POST …/messages/:id/regenerate`).
+- **Ghost mode:** temporary chat that is not saved on exit (`POST /api/chat/ephemeral`); ghost outline icon in the header (clickable SVG, no button chrome).
+
+**Verification:** 93 tests green; typecheck + web build clean.
+
+---
+
 ### ⏳ Pending
 
 **UI build — agreed order (2026-08-10):**
@@ -821,6 +846,13 @@ change the architecture if deferred past it. Decide before the product is sold.
 4. ~~Create advisor / Create section + drag~~ — done 2026-08-12
 
 *(Agreed 2026-08-10 UI queue is empty.)*
+
+**Knowledge feed (D-042–D-043) — designed, not built:**
+1. Offline ingest: documents and books per `expertType`.
+2. Distillation → versioned `advisor_knowledge` (Level 1, cacheable in advisor delta).
+3. Hierarchical index book → chapter → section (Level 2).
+4. Consent flow with cost estimate before deep search.
+5. Admin UI to “feed Financiero / Legal / …”.
 
 **Deferred to v2:**
 - Nightly digest (Batch API)
@@ -832,4 +864,4 @@ change the architecture if deferred past it. Decide before the product is sold.
 
 ---
 
-**Last Updated:** 2026-08-29 (rail polish: reorder, collapse, relative time, chat composer)
+**Last Updated:** 2026-08-29 (seven experts D-040–D-041; ghost chat, regenerate, and reply formatting)

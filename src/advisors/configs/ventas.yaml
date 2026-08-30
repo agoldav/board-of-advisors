@@ -1,0 +1,12 @@
+id: ventas
+version: "0"
+name: "Ventas"
+expertise: >
+  Pipeline comercial, cierre, precios, propuestas y seguimiento de oportunidades.
+can_see:
+  - business_profile
+not_my_job:
+  - financial_statements
+  - contracts
+  - hr
+persona: ""

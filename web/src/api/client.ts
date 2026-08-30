@@ -439,9 +439,26 @@ export type ConversationMessage = {
   createdAt: string;
 };
 
+export type AdvisorContext = {
+  expertType: string;
+  advisorId: string;
+  displayTitle: string;
+  customRole: string | null;
+  needsRoleDescription: boolean;
+  railNodeId: string | null;
+};
+
+export type AdvisorPersona = {
+  id: string;
+  name: string;
+  expertise: string;
+  version: string;
+};
+
 export type ConversationDetail = ConversationSummary & {
   messages: ConversationMessage[];
   attachment?: AttachmentMeta | null;
+  advisorContext?: AdvisorContext;
 };
 
 export type AttachmentMeta = {
@@ -449,6 +466,13 @@ export type AttachmentMeta = {
   fileName: string;
   mimeType: "application/pdf" | "image/jpeg" | "image/png";
 };
+
+export async function fetchAdvisors(): Promise<AdvisorPersona[]> {
+  const data = await api<{ ok: boolean; items: AdvisorPersona[] }>("/api/advisors", {
+    method: "GET",
+  });
+  return data.items;
+}
 
 export async function fetchConversations(
   ownerId: string,
@@ -547,6 +571,8 @@ export type RailNode = {
   parentId: string | null;
   sortOrder: number;
   archived: boolean;
+  expertType: string | null;
+  customRole: string | null;
   advisorId: string | null;
   messageCount: number;
   createdAt: string;
@@ -584,12 +610,14 @@ export async function patchRailNodeApi(args: {
   archived?: boolean;
   parentId?: string | null;
   index?: number;
+  customRole?: string;
 }): Promise<{ item?: RailNode; items?: RailNode[] }> {
   const body: Record<string, unknown> = { ownerId: args.ownerId };
   if (typeof args.title === "string") body.title = args.title;
   if (typeof args.archived === "boolean") body.archived = args.archived;
   if ("parentId" in args) body.parentId = args.parentId ?? null;
   if (typeof args.index === "number") body.index = args.index;
+  if (typeof args.customRole === "string") body.customRole = args.customRole;
   const data = await api<{ ok: boolean; item?: RailNode; items?: RailNode[] }>(
     `/api/rail/nodes/${args.nodeId}`,
     {
@@ -669,6 +697,7 @@ export async function sendConversationMessage(args: {
   conversationId: string;
   question: string;
   documentId?: string | null;
+  advisorId?: string;
 }): Promise<ConversationDetail> {
   const data = await api<{ ok: boolean; item: ConversationDetail }>(
     `/api/conversations/${args.conversationId}/messages`,
@@ -680,11 +709,61 @@ export async function sendConversationMessage(args: {
         profileId: args.profileId,
         question: args.question,
         documentId: args.documentId ?? undefined,
-        advisorId: "finance",
+        advisorId: args.advisorId,
       }),
     },
   );
   return data.item;
+}
+
+export async function regenerateConversationMessage(args: {
+  ownerId: string;
+  profileId: string;
+  conversationId: string;
+  messageId: string;
+  question: string;
+  documentId?: string | null;
+}): Promise<ConversationDetail> {
+  const data = await api<{ ok: boolean; item: ConversationDetail }>(
+    `/api/conversations/${args.conversationId}/messages/${args.messageId}/regenerate`,
+    {
+      method: "POST",
+      ownerId: args.ownerId,
+      body: JSON.stringify({
+        ownerId: args.ownerId,
+        profileId: args.profileId,
+        question: args.question,
+        documentId: args.documentId ?? undefined,
+      }),
+    },
+  );
+  return data.item;
+}
+
+export async function sendEphemeralMessage(args: {
+  ownerId: string;
+  profileId: string;
+  conversationId: string;
+  question: string;
+  priorTurns: Array<{ role: "user" | "assistant"; content: string }>;
+  documentId?: string | null;
+}): Promise<{ answer: string; model: string }> {
+  const data = await api<{ ok: boolean; answer: string; model: string }>(
+    "/api/chat/ephemeral",
+    {
+      method: "POST",
+      ownerId: args.ownerId,
+      body: JSON.stringify({
+        ownerId: args.ownerId,
+        profileId: args.profileId,
+        conversationId: args.conversationId,
+        question: args.question,
+        priorTurns: args.priorTurns,
+        documentId: args.documentId ?? undefined,
+      }),
+    },
+  );
+  return { answer: data.answer, model: data.model };
 }
 
 export function formatUsd(n: number): string {

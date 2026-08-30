@@ -1,0 +1,12 @@
+id: operaciones
+version: "0"
+name: "Operaciones"
+expertise: >
+  Capacidad, logística, cuellos de botella de personal y ejecución de proyectos.
+can_see:
+  - business_profile
+not_my_job:
+  - financial_statements
+  - contracts
+  - hr
+persona: ""

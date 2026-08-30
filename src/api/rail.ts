@@ -15,6 +15,7 @@ import {
   moveRailNode,
   renameRailNode,
   setRailArchived,
+  setRailCustomRole,
 } from "../rail/service.js";
 
 type SendJson = (
@@ -77,9 +78,11 @@ export async function tryHandleRailRequest(args: {
         kind,
         ...(typeof body.title === "string" ? { title: body.title } : {}),
         ...(parentId !== undefined ? { parentId } : {}),
-        ...(typeof body.advisorId === "string"
-          ? { advisorId: body.advisorId }
-          : {}),
+        ...(typeof body.expertType === "string"
+          ? { expertType: body.expertType }
+          : typeof body.advisorId === "string"
+            ? { expertType: body.advisorId }
+            : {}),
       });
       sendJson(res, 201, { ok: true, item });
       return true;
@@ -112,6 +115,16 @@ export async function tryHandleRailRequest(args: {
           return true;
         }
 
+        if (typeof body.customRole === "string" && body.customRole.trim()) {
+          const item = await setRailCustomRole({
+            ownerId,
+            nodeId,
+            customRole: body.customRole.trim(),
+          });
+          sendJson(res, 200, { ok: true, item });
+          return true;
+        }
+
         if ("parentId" in body || typeof body.index === "number") {
           const parentId =
             body.parentId === null
@@ -134,7 +147,7 @@ export async function tryHandleRailRequest(args: {
         }
 
         sendJson(res, 400, {
-          error: "Provide title, archived, or parentId/index",
+          error: "Provide title, archived, customRole, or parentId/index",
         });
         return true;
       }

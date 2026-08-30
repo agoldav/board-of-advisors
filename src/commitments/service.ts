@@ -213,7 +213,9 @@ function toRecord(
     closedEvidence: row.closed_evidence,
     status: row.status,
     displayStatus: computeDisplayStatus(fields, timezone),
-    origin: advisorId === "finance" ? "Asesor Financiero" : advisorId ?? "Board",
+    origin: advisorId === "financiero" || advisorId === "finance"
+      ? "Financiero"
+      : advisorId ?? "Board",
     createdAt: row.created_at.toISOString(),
   };
 }

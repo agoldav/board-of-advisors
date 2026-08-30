@@ -3,7 +3,7 @@
  * was claimed so the main router can stay additive.
  */
 import type { IncomingMessage, ServerResponse } from "node:http";
-import { askAdvisor, OutOfCreditsError as EngineCreditsError } from "../advisors/engine.js";
+import { OutOfCreditsError as EngineCreditsError } from "../advisors/engine.js";
 import {
   CannotDeleteLastConversationError,
   ConversationNotFoundError,
@@ -16,14 +16,11 @@ import {
   listConversations,
   maybeAutotitle,
   renameConversation,
-  rewriteUserMessageContent,
+  truncateConversationFromMessage,
 } from "../conversations/service.js";
-import {
-  buildParagraphModelPrompt,
-  parseAnchor,
-} from "../conversations/anchors.js";
 import { InvalidConversationExportError } from "../conversations/export.js";
-import { getConfirmedFiguresForAdvice } from "../documents/service.js";
+import { resolveAdvisorContext } from "../rail/resolveAdvisor.js";
+import { runAdvisorChatTurn } from "./chatTurn.js";
 
 type SendJson = (
   res: ServerResponse,
@@ -131,99 +128,99 @@ export async function tryHandleConversationRequest(args: {
     }
 
     {
+      const m = match(pathname, "/api/conversations/:id/messages/:messageId/regenerate");
+      if (m && req.method === "POST") {
+        const body = (await readJson(req)) as Record<string, unknown>;
+        const ownerId = ownerFrom(req, body);
+        const profileId = String(body.profileId ?? "");
+        const question = String(body.question ?? "").trim();
+        if (!profileId || !question) {
+          sendJson(res, 400, { error: "profileId and question are required" });
+          return true;
+        }
+        await getConversation(ownerId, m.id!);
+        await truncateConversationFromMessage({
+          ownerId,
+          conversationId: m.id!,
+          messageId: m.messageId!,
+        });
+        const documentId =
+          typeof body.documentId === "string" ? body.documentId.trim() : "";
+        try {
+          await runAdvisorChatTurn({
+            ownerId,
+            profileId,
+            conversationId: m.id!,
+            question,
+            ...(documentId ? { documentId } : {}),
+          });
+        } catch (err) {
+          if (err instanceof Error && err.message === "NEEDS_ROLE_DESCRIPTION") {
+            const advisorContext = await resolveAdvisorContext(ownerId, m.id!);
+            sendJson(res, 409, {
+              error: "Definí qué debe hacer este asesor antes de chatear.",
+              code: "NEEDS_ROLE_DESCRIPTION",
+              advisorContext,
+            });
+            return true;
+          }
+          throw err;
+        }
+        await maybeAutotitle({
+          ownerId,
+          conversationId: m.id!,
+          question,
+        });
+        const advisorContext = await resolveAdvisorContext(ownerId, m.id!);
+        const item = await getConversation(ownerId, m.id!);
+        sendJson(res, 200, { ok: true, item: { ...item, advisorContext } });
+        return true;
+      }
+    }
+
+    {
       const m = match(pathname, "/api/conversations/:id/messages");
       if (m && req.method === "POST") {
         const body = (await readJson(req)) as Record<string, unknown>;
         const ownerId = ownerFrom(req, body);
         const profileId = String(body.profileId ?? "");
         const question = String(body.question ?? "").trim();
-        const advisorId =
-          typeof body.advisorId === "string" && body.advisorId.trim()
-            ? body.advisorId.trim()
-            : "finance";
         if (!profileId || !question) {
           sendJson(res, 400, { error: "profileId and question are required" });
           return true;
         }
         await getConversation(ownerId, m.id!);
-
-        const detailBefore = await getConversation(ownerId, m.id!);
-        const anchorMsg = detailBefore.messages.find(
-          (msg) => msg.role === "system" && parseAnchor(msg.content),
-        );
-        const anchor = anchorMsg ? parseAnchor(anchorMsg.content) : null;
-        const priorTurns = detailBefore.messages
-          .filter((msg) => msg.role === "user" || msg.role === "assistant")
-          .map((msg) => ({
-            role: msg.role as "user" | "assistant",
-            content: msg.content,
-          }));
-
-        let dataSnapshot: unknown = {};
         const documentId =
           typeof body.documentId === "string" ? body.documentId.trim() : "";
-        if (documentId) {
-          try {
-            dataSnapshot = await getConfirmedFiguresForAdvice(ownerId, documentId);
-          } catch {
-            dataSnapshot = {};
-          }
-        }
-        if (anchor) {
-          dataSnapshot = {
-            ...(typeof dataSnapshot === "object" && dataSnapshot
-              ? (dataSnapshot as object)
-              : {}),
-            paragraphAnchor: anchor,
-          };
-        }
-
-        const modelQuestion = anchor
-          ? buildParagraphModelPrompt({
-              anchor,
-              question,
-              priorTurns,
-            })
-          : priorTurns.length > 0
-            ? [
-                ...priorTurns.map((t) =>
-                  t.role === "user"
-                    ? `Dueño: ${t.content}`
-                    : `Asesor: ${t.content}`,
-                ),
-                `Dueño: ${question}`,
-              ].join("\n\n")
-            : question;
-
-        const result = await askAdvisor({
-          ownerId,
-          profileId,
-          conversationId: m.id!,
-          advisorId,
-          question: modelQuestion,
-          dataSnapshot,
-          saveAsRecommendation: false,
-        });
-
-        // Keep the stored user bubble as the short question the owner typed
-        // (askAdvisor persists the full model prompt otherwise).
-        if (modelQuestion !== question) {
-          await rewriteUserMessageContent({
+        try {
+          await runAdvisorChatTurn({
             ownerId,
-            messageId: result.userMessageId,
-            content: question,
-          });
-        }
-
-        if (!anchor) {
-          await maybeAutotitle({
-            ownerId,
+            profileId,
             conversationId: m.id!,
             question,
+            ...(documentId ? { documentId } : {}),
           });
+        } catch (err) {
+          if (err instanceof Error && err.message === "NEEDS_ROLE_DESCRIPTION") {
+            const advisorContext = await resolveAdvisorContext(ownerId, m.id!);
+            sendJson(res, 409, {
+              error:
+                "Definí qué debe hacer este asesor antes de chatear.",
+              code: "NEEDS_ROLE_DESCRIPTION",
+              advisorContext,
+            });
+            return true;
+          }
+          throw err;
         }
+        await maybeAutotitle({
+          ownerId,
+          conversationId: m.id!,
+          question,
+        });
+        const advisorContext = await resolveAdvisorContext(ownerId, m.id!);
         const item = await getConversation(ownerId, m.id!);
-        sendJson(res, 201, { ok: true, item, ...result });
+        sendJson(res, 201, { ok: true, item: { ...item, advisorContext } });
         return true;
       }
     }
@@ -233,7 +230,8 @@ export async function tryHandleConversationRequest(args: {
       if (m && req.method === "GET") {
         const ownerId = ownerFrom(req);
         const item = await getConversation(ownerId, m.id!);
-        sendJson(res, 200, { ok: true, item });
+        const advisorContext = await resolveAdvisorContext(ownerId, m.id!);
+        sendJson(res, 200, { ok: true, item: { ...item, advisorContext } });
         return true;
       }
       if (m && req.method === "PATCH") {

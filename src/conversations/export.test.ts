@@ -36,7 +36,7 @@ describe("conversation export", () => {
       {
         role: "assistant",
         content: "Todavía no.",
-        advisorId: "finance",
+        advisorId: "financiero",
         modelUsed: "claude-sonnet-5",
         createdAt: "2026-08-01T12:01:05.000Z",
       },

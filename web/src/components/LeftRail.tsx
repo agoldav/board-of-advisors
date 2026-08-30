@@ -21,6 +21,15 @@ type RailActive =
 
 type MenuState = { id: string; x: number; y: number } | null;
 
+type ConfirmState = {
+  message: string;
+  x: number;
+  y: number;
+  run: () => Promise<void>;
+} | null;
+
+const CONFIRM_OFFSET = 6;
+
 const DEFAULT_THREAD_TITLE = "Nuevo hilo";
 
 type DragPayload = { id: string };
@@ -42,6 +51,16 @@ function resolveActive(pathname: string): RailActive {
 function compareNodes(a: RailNode, b: RailNode): number {
   if (a.sortOrder !== b.sortOrder) return a.sortOrder - b.sortOrder;
   return a.createdAt.localeCompare(b.createdAt);
+}
+
+function confirmPosition(x: number, y: number): { left: number; top: number } {
+  const pad = 8;
+  const width = 280;
+  const height = 120;
+  return {
+    left: Math.max(pad, Math.min(x + CONFIRM_OFFSET, window.innerWidth - width - pad)),
+    top: Math.max(pad, Math.min(y + CONFIRM_OFFSET, window.innerHeight - height - pad)),
+  };
 }
 
 function childrenOf(nodes: RailNode[], parentId: string | null): RailNode[] {
@@ -165,6 +184,7 @@ export function LeftRail() {
   const active = resolveActive(pathname);
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [menu, setMenu] = useState<MenuState>(null);
+  const [confirm, setConfirm] = useState<ConfirmState>(null);
   const [nodes, setNodes] = useState<RailNode[]>([]);
   const [railError, setRailError] = useState<string | null>(null);
   const [dragOverId, setDragOverId] = useState<string | null>(null);
@@ -181,6 +201,7 @@ export function LeftRail() {
   const [nowTick, setNowTick] = useState(0);
   const importRef = useRef<HTMLInputElement>(null);
   const menuRef = useRef<HTMLDivElement>(null);
+  const confirmRef = useRef<HTMLDivElement>(null);
 
   const {
     session,
@@ -260,6 +281,8 @@ export function LeftRail() {
       parentId: args.parentId,
       sortOrder: Date.now(),
       archived: false,
+      expertType: null,
+      customRole: null,
       advisorId: null,
       messageCount: 0,
       createdAt: now,
@@ -354,6 +377,23 @@ export function LeftRail() {
       document.removeEventListener("keydown", onKey);
     };
   }, [menu]);
+
+  useEffect(() => {
+    if (!confirm) return;
+    function onDoc(e: globalThis.MouseEvent) {
+      if (confirmRef.current?.contains(e.target as Node)) return;
+      setConfirm(null);
+    }
+    function onKey(e: KeyboardEvent) {
+      if (e.key === "Escape") setConfirm(null);
+    }
+    document.addEventListener("mousedown", onDoc);
+    document.addEventListener("keydown", onKey);
+    return () => {
+      document.removeEventListener("mousedown", onDoc);
+      document.removeEventListener("keydown", onKey);
+    };
+  }, [confirm]);
 
   const visible = useMemo(() => nodes.filter((n) => !n.archived), [nodes]);
 
@@ -628,25 +668,30 @@ export function LeftRail() {
     }
   }
 
-  async function onDelete(node: RailNode) {
+  function openDeleteConfirm(
+    message: string,
+    x: number,
+    y: number,
+    run: () => Promise<void>,
+  ) {
+    setConfirm({ message, x, y, run });
+  }
+
+  async function onDelete(node: RailNode, x: number, y: number) {
     if (!session) return;
-    if (
-      !window.confirm(
-        `¿Borrar “${node.title}”? Los hijos pasan al nivel del padre.`,
-      )
-    ) {
-      return;
-    }
-    try {
-      await deleteRailNodeApi(session.ownerId, node.id);
-      await refreshRail();
-      if (activeThreadId === node.id) {
-        const next = (await fetchRail(session.ownerId)).find((n) => !n.archived);
-        navigate(next ? `/chat/${next.id}` : "/chat");
-      }
-    } catch (err) {
-      window.alert(err instanceof Error ? err.message : "No se pudo borrar.");
-    }
+    openDeleteConfirm(
+      `¿Borrar “${node.title}”? Los hijos pasan al nivel del padre.`,
+      x,
+      y,
+      async () => {
+        await deleteRailNodeApi(session.ownerId, node.id);
+        await refreshRail();
+        if (activeThreadId === node.id) {
+          const next = (await fetchRail(session.ownerId)).find((n) => !n.archived);
+          navigate(next ? `/chat/${next.id}` : "/chat");
+        }
+      },
+    );
   }
 
   async function onCreateThreadUnder(parentId: string | null) {
@@ -654,18 +699,29 @@ export function LeftRail() {
     void persistNewNode({ kind: "thread", parentId });
   }
 
-  async function onDeleteLegacy(id: string) {
-    if (!window.confirm("¿Borrar este hilo? Los mensajes se pierden (podés exportarlo antes).")) {
-      return;
-    }
+  async function onDeleteLegacy(id: string, x: number, y: number) {
+    openDeleteConfirm(
+      "¿Borrar este hilo? Los mensajes se pierden (podés exportarlo antes).",
+      x,
+      y,
+      async () => {
+        const nextId = await deleteThread(id);
+        await refreshRail();
+        if (activeThreadId === id) {
+          navigate(nextId ? `/chat/${nextId}` : "/chat");
+        }
+      },
+    );
+  }
+
+  async function runConfirm() {
+    if (!confirm) return;
+    const action = confirm.run;
+    setConfirm(null);
     try {
-      const nextId = await deleteThread(id);
-      await refreshRail();
-      if (activeThreadId === id) {
-        navigate(nextId ? `/chat/${nextId}` : "/chat");
-      }
+      await action();
     } catch (err) {
-      window.alert(err instanceof Error ? err.message : "No se pudo borrar el hilo.");
+      window.alert(err instanceof Error ? err.message : "No se pudo completar la acción.");
     }
   }
 
@@ -848,7 +904,9 @@ export function LeftRail() {
                       type="button"
                       className="tree-icon-btn"
                       title="Borrar hilo"
-                      onClick={() => void onDeleteLegacy(node.id)}
+                      onClick={(e) => {
+                        void onDeleteLegacy(node.id, e.clientX, e.clientY);
+                      }}
                     >
                       ×
                     </button>
@@ -1185,9 +1243,10 @@ export function LeftRail() {
           <button
             type="button"
             role="menuitem"
-            onClick={() => {
+            onClick={(e) => {
+              const { clientX, clientY } = e;
               setMenu(null);
-              void onDelete(menuNode);
+              void onDelete(menuNode, clientX, clientY);
             }}
           >
             Delete
@@ -1202,6 +1261,28 @@ export function LeftRail() {
           >
             Create Sub
           </button>
+        </div>
+      )}
+
+      {confirm && (
+        <div
+          ref={confirmRef}
+          className="rail-confirm"
+          style={confirmPosition(confirm.x, confirm.y)}
+          role="alertdialog"
+          aria-labelledby="rail-confirm-msg"
+        >
+          <p id="rail-confirm-msg" className="rail-confirm-msg">
+            {confirm.message}
+          </p>
+          <div className="rail-confirm-actions">
+            <button type="button" className="btn btn-ghost" onClick={() => setConfirm(null)}>
+              Cancelar
+            </button>
+            <button type="button" className="btn btn-danger" onClick={() => void runConfirm()}>
+              Borrar
+            </button>
+          </div>
         </div>
       )}
 

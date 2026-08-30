@@ -4,7 +4,14 @@
  */
 import type { PoolClient } from "pg";
 import { getPool, withTransaction } from "../db/pool.js";
-import { listAdvisors } from "../advisors/registry.js";
+import { getAdvisor, normalizeExpertId } from "../advisors/registry.js";
+import {
+  CUSTOM_EXPERT_TYPE,
+  defaultTitleForExpertType,
+  isPresetExpertType,
+  PRESET_EXPERT_TYPES,
+  presetTypeForTitle,
+} from "../advisors/presets.js";
 import {
   parseAnchor,
   ANCHOR_PREFIX,
@@ -44,6 +51,10 @@ export type RailNode = {
   parentId: string | null;
   sortOrder: number;
   archived: boolean;
+  /** Preset slug or "custom" (D-040). */
+  expertType: string | null;
+  customRole: string | null;
+  /** @deprecated Same as expertType for preset advisors. */
   advisorId: string | null;
   messageCount: number;
   createdAt: string;
@@ -65,7 +76,6 @@ type MarkerBag = {
   railMessageId: string | null;
 };
 
-const DEFAULT_ADVISOR_TITLE = "Financial Advisor";
 const DEFAULT_TITLE = "Nuevo hilo";
 
 function displayTitle(title: string | null): string {
@@ -73,9 +83,59 @@ function displayTitle(title: string | null): string {
   return t ? t : DEFAULT_TITLE;
 }
 
-function defaultAdvisorPersona(): string {
-  const list = listAdvisors();
-  return list.find((a) => a.id === "finance")?.id ?? list[0]?.id ?? "finance";
+function nodeExpertType(rail: RailMeta | null | undefined): string | null {
+  const raw = rail?.expertType ?? rail?.advisorId;
+  if (!raw?.trim()) return null;
+  const normalized = normalizeExpertId(raw.trim());
+  if (normalized === CUSTOM_EXPERT_TYPE) return CUSTOM_EXPERT_TYPE;
+  if (isPresetExpertType(normalized)) return normalized;
+  try {
+    getAdvisor(normalized);
+    return normalized;
+  } catch {
+    return null;
+  }
+}
+
+function toRailMeta(
+  node: Pick<
+    RailNode,
+    "kind" | "parentId" | "sortOrder" | "archived" | "expertType" | "customRole"
+  >,
+): RailMeta {
+  const meta: RailMeta = {
+    kind: node.kind,
+    parentId: node.parentId,
+    sortOrder: node.sortOrder,
+    archived: node.archived,
+  };
+  if (node.expertType) {
+    meta.expertType = node.expertType;
+    if (node.expertType !== CUSTOM_EXPERT_TYPE) {
+      meta.advisorId = node.expertType;
+    }
+  }
+  if (node.customRole?.trim()) meta.customRole = node.customRole.trim();
+  return meta;
+}
+
+/** Pick the next unused preset expert type, else custom (D-040). */
+function pickExpertTypeForNewAdvisor(nodes: RailNode[]): {
+  expertType: string;
+  defaultTitle: string;
+} {
+  const used = new Set(
+    nodes
+      .filter((n) => n.kind === "advisor" && !n.archived && n.expertType)
+      .map((n) => n.expertType!)
+      .filter((id) => isPresetExpertType(id)),
+  );
+  for (const preset of PRESET_EXPERT_TYPES) {
+    if (!used.has(preset.id)) {
+      return { expertType: preset.id, defaultTitle: preset.defaultTitle };
+    }
+  }
+  return { expertType: CUSTOM_EXPERT_TYPE, defaultTitle: "Nuevo asesor" };
 }
 
 async function loadConversations(ownerId: string): Promise<RowConv[]> {
@@ -170,6 +230,16 @@ function nextSortOrder(
   return max + 1;
 }
 
+function presetTypeForAdvisor(advisor: RailNode): string | null {
+  const raw = advisor.expertType ?? advisor.advisorId;
+  if (raw) {
+    const normalized = normalizeExpertId(raw);
+    if (normalized === CUSTOM_EXPERT_TYPE) return null;
+    if (isPresetExpertType(normalized)) return normalized;
+  }
+  return presetTypeForTitle(advisor.title);
+}
+
 function buildNodes(
   convs: RowConv[],
   markers: Map<string, MarkerBag>,
@@ -186,7 +256,9 @@ function buildNodes(
       parentId: rail?.parentId ?? parentFromAnchor,
       sortOrder: rail?.sortOrder ?? 0,
       archived: rail?.archived ?? false,
-      advisorId: rail?.advisorId ?? null,
+      expertType: nodeExpertType(rail),
+      customRole: rail?.customRole?.trim() || null,
+      advisorId: nodeExpertType(rail),
       messageCount: Number(c.message_count),
       createdAt: c.created_at.toISOString(),
       lastActivityAt: c.last_activity_at.toISOString(),
@@ -211,22 +283,114 @@ async function snapshot(ownerId: string): Promise<{
   return { convs, markers, nodes };
 }
 
-/**
- * Ensure at least one top-level advisor exists and orphan chats hang under it.
- * Idempotent; may write rail markers for legacy threads.
- */
-export async function ensureRailTree(ownerId: string): Promise<RailNode[]> {
-  let { markers, nodes } = await snapshot(ownerId);
-
+/** Backfill expertType and archive duplicate preset cards (D-040). */
+async function reconcilePresetAdvisors(
+  ownerId: string,
+  nodes: RailNode[],
+): Promise<void> {
+  const markers = await loadSystemMarkers(ownerId);
   const advisors = nodes.filter((n) => n.kind === "advisor" && !n.archived);
-  let defaultAdvisorId =
-    advisors.find((a) => a.parentId === null)?.id ?? advisors[0]?.id ?? null;
+  const pool = getPool();
 
-  if (!defaultAdvisorId) {
-    const pool = getPool();
+  for (const advisor of advisors) {
+    if (advisor.expertType && advisor.expertType !== CUSTOM_EXPERT_TYPE) continue;
+    const inferred = presetTypeForTitle(advisor.title);
+    if (!inferred) continue;
+    const m = markers.get(advisor.id);
+    await upsertRailMeta(pool, {
+      ownerId,
+      conversationId: advisor.id,
+      meta: toRailMeta({
+        kind: advisor.kind,
+        parentId: advisor.parentId,
+        sortOrder: advisor.sortOrder,
+        archived: advisor.archived,
+        expertType: inferred,
+        customRole: advisor.customRole,
+      }),
+      existingMessageId: m?.railMessageId ?? null,
+    });
+    advisor.expertType = inferred;
+    advisor.advisorId = inferred;
+  }
+
+  const byType = new Map<string, RailNode[]>();
+  for (const advisor of advisors) {
+    const type = presetTypeForAdvisor(advisor);
+    if (!type) continue;
+    const group = byType.get(type) ?? [];
+    group.push(advisor);
+    byType.set(type, group);
+  }
+
+  for (const group of byType.values()) {
+    if (group.length <= 1) continue;
+    group.sort(
+      (a, b) => a.sortOrder - b.sortOrder || a.createdAt.localeCompare(b.createdAt),
+    );
+    const keeper = group[0]!;
+    for (const dup of group.slice(1)) {
+      const children = nodes.filter((n) => n.parentId === dup.id && !n.archived);
+      for (const child of children) {
+        const cm = markers.get(child.id);
+        await upsertRailMeta(pool, {
+          ownerId,
+          conversationId: child.id,
+          meta: toRailMeta({
+            kind: child.kind,
+            parentId: keeper.id,
+            sortOrder: child.sortOrder,
+            archived: false,
+            expertType: child.expertType,
+            customRole: child.customRole,
+          }),
+          existingMessageId: cm?.railMessageId ?? null,
+        });
+      }
+      const dm = markers.get(dup.id);
+      await upsertRailMeta(pool, {
+        ownerId,
+        conversationId: dup.id,
+        meta: toRailMeta({
+          kind: dup.kind,
+          parentId: dup.parentId,
+          sortOrder: dup.sortOrder,
+          archived: true,
+          expertType: dup.expertType,
+          customRole: dup.customRole,
+        }),
+        existingMessageId: dm?.railMessageId ?? null,
+      });
+    }
+  }
+}
+
+/** Seed the seven preset expert cards on the rail when any are missing (D-040). */
+async function ensurePresetAdvisorCards(
+  ownerId: string,
+  nodes: RailNode[],
+): Promise<void> {
+  const advisors = nodes.filter((n) => n.kind === "advisor" && !n.archived);
+  const usedTypes = new Set<string>();
+  for (const advisor of advisors) {
+    const type = presetTypeForAdvisor(advisor);
+    if (type) usedTypes.add(type);
+  }
+
+  const missing = PRESET_EXPERT_TYPES.filter((p) => !usedTypes.has(p.id));
+  if (missing.length === 0) return;
+
+  let sortOrder = 0;
+  for (const advisor of advisors) {
+    if ((advisor.parentId ?? null) !== null) continue;
+    sortOrder = Math.max(sortOrder, advisor.sortOrder + 1);
+  }
+
+  const pool = getPool();
+  for (const preset of missing) {
     const { rows } = await pool.query<{ id: string }>(
       `INSERT INTO conversations (owner_id, title) VALUES ($1, $2) RETURNING id`,
-      [ownerId, DEFAULT_ADVISOR_TITLE],
+      [ownerId, preset.defaultTitle],
     );
     const id = rows[0]!.id;
     await upsertRailMeta(pool, {
@@ -235,14 +399,43 @@ export async function ensureRailTree(ownerId: string): Promise<RailNode[]> {
       meta: {
         kind: "advisor",
         parentId: null,
-        sortOrder: 0,
+        sortOrder,
         archived: false,
-        advisorId: defaultAdvisorPersona(),
+        expertType: preset.id,
+        advisorId: preset.id,
       },
       existingMessageId: null,
     });
-    defaultAdvisorId = id;
-    ({ markers, nodes } = await snapshot(ownerId));
+    sortOrder += 1;
+  }
+}
+
+async function syncPresetAdvisors(ownerId: string): Promise<void> {
+  await withTransaction(async (client) => {
+    await client.query(`SELECT pg_advisory_xact_lock(hashtext($1))`, [
+      `boa-rail-seed:${ownerId}`,
+    ]);
+    let { nodes } = await snapshot(ownerId);
+    await reconcilePresetAdvisors(ownerId, nodes);
+    ({ nodes } = await snapshot(ownerId));
+    await ensurePresetAdvisorCards(ownerId, nodes);
+  });
+}
+
+/**
+ * Ensure at least one top-level advisor exists and orphan chats hang under it.
+ * Idempotent; may write rail markers for legacy threads.
+ */
+export async function ensureRailTree(ownerId: string): Promise<RailNode[]> {
+  await syncPresetAdvisors(ownerId);
+  let { markers, nodes } = await snapshot(ownerId);
+
+  const advisors = nodes.filter((n) => n.kind === "advisor" && !n.archived);
+  const defaultAdvisorId =
+    advisors.find((a) => a.parentId === null)?.id ?? advisors[0]?.id ?? null;
+
+  if (!defaultAdvisorId) {
+    throw new Error("Rail tree has no advisors after preset seed.");
   }
 
   const knownIds = new Set(nodes.map((n) => n.id));
@@ -329,7 +522,7 @@ export async function createRailNode(args: {
   kind: "advisor" | "section" | "thread";
   title?: string;
   parentId?: string | null;
-  advisorId?: string;
+  expertType?: string;
 }): Promise<RailNode> {
   const parentId = args.parentId ?? null;
 
@@ -345,13 +538,25 @@ export async function createRailNode(args: {
 
   const nodes = await readRailNodes(args.ownerId);
 
-  const title =
-    args.title?.trim() ||
-    (args.kind === "advisor"
-      ? "New advisor"
-      : args.kind === "section"
-        ? "New section"
-        : DEFAULT_TITLE);
+  let expertType: string | null = null;
+  let title = args.title?.trim();
+  if (args.kind === "advisor") {
+    if (args.expertType?.trim()) {
+      expertType = normalizeExpertId(args.expertType.trim());
+      if (expertType !== CUSTOM_EXPERT_TYPE && !isPresetExpertType(expertType)) {
+        getAdvisor(expertType);
+      }
+    } else {
+      const pick = pickExpertTypeForNewAdvisor(nodes);
+      expertType = pick.expertType;
+      if (!title) title = pick.defaultTitle;
+    }
+    if (!title) title = defaultTitleForExpertType(expertType);
+  } else {
+    title =
+      title ||
+      (args.kind === "section" ? "New section" : DEFAULT_TITLE);
+  }
 
   const sortOrder = nextSortOrder(
     nodes.map((n) => ({
@@ -362,10 +567,6 @@ export async function createRailNode(args: {
     parentId,
   );
 
-  const persona =
-    args.advisorId?.trim() ||
-    (args.kind === "advisor" ? defaultAdvisorPersona() : undefined);
-
   const id = await withTransaction(async (client) => {
     const { rows } = await client.query<{ id: string }>(
       `INSERT INTO conversations (owner_id, title) VALUES ($1, $2) RETURNING id`,
@@ -375,13 +576,14 @@ export async function createRailNode(args: {
     await upsertRailMeta(client, {
       ownerId: args.ownerId,
       conversationId,
-      meta: {
+      meta: toRailMeta({
         kind: args.kind,
         parentId,
         sortOrder,
         archived: false,
-        ...(persona ? { advisorId: persona } : {}),
-      },
+        expertType,
+        customRole: null,
+      }),
       existingMessageId: null,
     });
     return conversationId;
@@ -395,7 +597,9 @@ export async function createRailNode(args: {
     parentId,
     sortOrder,
     archived: false,
-    advisorId: persona ?? null,
+    expertType,
+    customRole: null,
+    advisorId: expertType,
     messageCount: 0,
     createdAt: now,
     lastActivityAt: now,
@@ -436,13 +640,56 @@ export async function setRailArchived(args: {
   await upsertRailMeta(getPool(), {
     ownerId: args.ownerId,
     conversationId: args.nodeId,
-    meta: {
+    meta: toRailMeta({
       kind: node.kind,
       parentId: node.parentId,
       sortOrder: node.sortOrder,
       archived: args.archived,
-      ...(node.advisorId ? { advisorId: node.advisorId } : {}),
-    },
+      expertType: node.expertType,
+      customRole: node.customRole,
+    }),
+    existingMessageId: m?.railMessageId ?? null,
+  });
+
+  const list = await listRailNodes(args.ownerId);
+  const updated = list.find((n) => n.id === args.nodeId);
+  if (!updated) throw new ConversationNotFoundError(args.nodeId);
+  return updated;
+}
+
+export async function setRailCustomRole(args: {
+  ownerId: string;
+  nodeId: string;
+  customRole: string;
+}): Promise<RailNode> {
+  const customRole = args.customRole.trim();
+  if (!customRole) {
+    throw new RailValidationError("customRole is required.");
+  }
+
+  const ensured = await listRailNodes(args.ownerId);
+  const node = ensured.find((n) => n.id === args.nodeId);
+  if (!node) throw new ConversationNotFoundError(args.nodeId);
+  if (node.kind !== "advisor") {
+    throw new RailValidationError("Solo un advisor puede definir su rol.");
+  }
+  if (node.expertType !== CUSTOM_EXPERT_TYPE) {
+    throw new RailValidationError("Solo un asesor personalizado puede definir su rol.");
+  }
+
+  const markers = await loadSystemMarkers(args.ownerId);
+  const m = markers.get(args.nodeId);
+  await upsertRailMeta(getPool(), {
+    ownerId: args.ownerId,
+    conversationId: args.nodeId,
+    meta: toRailMeta({
+      kind: node.kind,
+      parentId: node.parentId,
+      sortOrder: node.sortOrder,
+      archived: node.archived,
+      expertType: node.expertType,
+      customRole,
+    }),
     existingMessageId: m?.railMessageId ?? null,
   });
 
@@ -503,13 +750,14 @@ export async function moveRailNode(args: {
     for (let i = 0; i < orderedIds.length; i++) {
       const id = orderedIds[i]!;
       const current = nodes.find((n) => n.id === id)!;
-      const meta: RailMeta = {
+      const meta = toRailMeta({
         kind: current.kind,
         parentId: id === args.nodeId ? args.parentId : current.parentId,
         sortOrder: i,
         archived: false,
-        ...(current.advisorId ? { advisorId: current.advisorId } : {}),
-      };
+        expertType: current.expertType,
+        customRole: current.customRole,
+      });
       const m = markers.get(id);
       await upsertRailMeta(client, {
         ownerId: args.ownerId,
@@ -551,13 +799,14 @@ export async function deleteRailNode(args: {
     }
 
     for (const child of children) {
-      const meta: RailMeta = {
+      const meta = toRailMeta({
         kind: child.kind,
         parentId: node.parentId,
         sortOrder: child.sortOrder,
         archived: child.archived,
-        ...(child.advisorId ? { advisorId: child.advisorId } : {}),
-      };
+        expertType: child.expertType,
+        customRole: child.customRole,
+      });
       const m = markers.get(child.id);
       await upsertRailMeta(client, {
         ownerId: args.ownerId,

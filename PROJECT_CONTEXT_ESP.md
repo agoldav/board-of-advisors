@@ -151,6 +151,10 @@ Pregunta: ¿vale el riesgo?
 | D-037 | 2026-08-08 | **Extraer todos los renglones del estado financiero en la primera pasada, no solo los totales.** | El Caso C es una pregunta de renglón. Extraer solo resúmenes forzaría a reenviar el PDF completo en la consulta más importante del producto, a ~10× el costo. |
 | D-038 | 2026-08-08 | **La primera lectura se escribe en pantalla mientras se genera.** | Puede tardar minutos. Una rueda girando ese tiempo se lee como que se colgó y el dueño recarga. |
 | D-039 | 2026-08-10 | **Hilos de chat (y comentarios por párrafo) viven en la BD de la app**, igual que los compromisos. Exportar/importar archivo a carpeta local es respaldo opcional, no la fuente de verdad. | El caché del navegador se borra; vigilar una carpeta del disco es frágil (permisos, rutas, el browser no puede hacerlo bien). Confirmado por el dueño. |
+| D-040 | 2026-08-29 | **El nombre que el dueño asigna al advisor en el rail ES la identidad del experto que responde.** No hay una “persona oculta” separada del título de la tarjeta. Siete tipos predeterminados: Financiero, Mercadeo, Operaciones, Ventas, PM, IT, Legal. Del octavo en adelante: nombre libre = asesor custom. | Corrección del dueño. El modelo tarjeta≠persona (finance/operations en YAML) contradecía el producto: el dueño nombra al experto, no decora una persona del sistema. |
+| D-041 | 2026-08-29 | **Asesores custom: en el primer chat se pide describir qué debe hacer el asesor.** Esa descripción se guarda en el nodo del rail y define el rol hasta que el dueño la edite. | Sin onboarding el nombre libre no alcanza para instruir al modelo. Una sola pregunta al abrir el primer hilo bajo ese advisor. |
+| D-042 | 2026-08-29 | **Conocimiento de libros/docs en dos niveles.** Nivel 1 (default): respuesta desde conocimiento destilado al subir material (estudio offline, no en cada pregunta). Nivel 2 (opt-in): si la memoria no alcanza, el asesor avisa, estima costo en tokens/dólares y **pide confirmación** antes de buscar en el índice del libro (capítulo → sección). Nunca buscar sin consentimiento. | El dueño quiere respuestas “de memoria”, no RAG en cada consulta; pero quiere profundidad bajo demanda con transparencia de costo. Alineado con D-032 (visibilidad de gasto). |
+| D-043 | 2026-08-29 | **Pipeline de feed de conocimiento (futuro):** ingesta → chunk + índice jerárquico → destilación por `expertType` → versión cacheable en el delta del asesor. La búsqueda profunda (Nivel 2) solo lee capítulos/secciones relevantes, nunca el corpus completo. | Diseño para eficiencia de tokens: libros enteros se procesan una vez; en runtime entra destilado + retrieval acotado con tope. |
 
 ---
 
@@ -836,6 +840,27 @@ vender el producto.
 
 ---
 
+**Sesión 2026-08-29 — Siete expertos, chat temporal y regenerar**
+
+**Modelo de asesores (D-040–D-041):**
+- Siete expertos predeterminados en YAML: Financiero, Mercadeo, Operaciones, Ventas, PM, IT, Legal (`src/advisors/presets.ts` + `configs/*.yaml`).
+- El nombre de la tarjeta en el rail **es** la identidad del experto; el chat resuelve el experto subiendo el árbol del rail (`resolveAdvisor`), sin selector “cambiar persona”.
+- Al cargar el rail se aseguran las siete tarjetas predeterminadas; reconciliación evita duplicados y hace backfill de `expertType`.
+- Asesores custom (8+): en el primer chat se pide describir el rol; se guarda en el nodo del rail hasta que el dueño lo edite.
+- `GET /api/advisors` lista los tipos disponibles.
+
+**UX del rail:**
+- Confirmación de borrado junto al cursor (popover propio), no el diálogo centrado del navegador.
+
+**Chat:**
+- Respuestas del asesor con formato legible (texto más grande, negritas, resalte en montos y porcentajes).
+- Editar una pregunta del dueño y regenerar la respuesta del asesor (`POST …/messages/:id/regenerate`).
+- **Modo fantasma:** chat temporal que no se guarda al salir (`POST /api/chat/ephemeral`); ícono de fantasma en el encabezado (outline clickeable, sin caja de botón).
+
+**Verificación:** 93 tests en verde; typecheck + `web` build limpios.
+
+---
+
 ### ⏳ Pendiente
 
 **Construcción UI — orden acordado (2026-08-10):**
@@ -845,6 +870,13 @@ vender el producto.
 4. ~~Create advisor / Create section + arrastrar~~ — hecho 2026-08-12
 
 *(Cola UI del acuerdo 2026-08-10 vacía.)*
+
+**Feed de conocimiento (D-042–D-043) — diseñado, no construido:**
+1. Ingesta offline: documentos y libros por `expertType`.
+2. Destilación → `advisor_knowledge` versionado (Nivel 1, cacheable en delta del asesor).
+3. Índice jerárquico libro → capítulo → sección (Nivel 2).
+4. Flujo de consentimiento con estimación de costo antes de búsqueda profunda.
+5. UI de administración “alimentar Financiero / Legal / …”.
 
 **Diferidos a v2:**
 - Resumen nocturno (Batch API)
@@ -856,4 +888,4 @@ vender el producto.
 
 ---
 
-**Última actualización:** 2026-08-29 (pulido rail: reordenar, colapsar, tiempos relativos, chat)
+**Última actualización:** 2026-08-29 (siete expertos D-040–D-041; chat temporal, regenerar y formato de respuestas)

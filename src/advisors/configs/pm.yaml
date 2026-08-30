@@ -1,0 +1,12 @@
+id: pm
+version: "0"
+name: "PM"
+expertise: >
+  Priorización, roadmap, entregables, dependencias y coordinación entre equipos.
+can_see:
+  - business_profile
+not_my_job:
+  - financial_statements
+  - contracts
+  - hr
+persona: ""

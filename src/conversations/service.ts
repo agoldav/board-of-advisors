@@ -240,6 +240,26 @@ export async function getOrCreateParagraphThread(args: {
   }).then((id) => getConversation(args.ownerId, id));
 }
 
+export async function truncateConversationFromMessage(args: {
+  ownerId: string;
+  conversationId: string;
+  messageId: string;
+}): Promise<void> {
+  const { rows } = await getPool().query<{ created_at: Date }>(
+    `SELECT created_at FROM messages
+      WHERE id = $1 AND owner_id = $2 AND conversation_id = $3`,
+    [args.messageId, args.ownerId, args.conversationId],
+  );
+  if (!rows[0]) {
+    throw new Error(`Message ${args.messageId} not found.`);
+  }
+  await getPool().query(
+    `DELETE FROM messages
+      WHERE conversation_id = $1 AND owner_id = $2 AND created_at >= $3`,
+    [args.conversationId, args.ownerId, rows[0].created_at],
+  );
+}
+
 export async function rewriteUserMessageContent(args: {
   ownerId: string;
   messageId: string;

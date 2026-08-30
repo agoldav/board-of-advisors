@@ -1,0 +1,12 @@
+id: it
+version: "0"
+name: "IT"
+expertise: >
+  Sistemas, herramientas, automatización, datos y seguridad operativa.
+can_see:
+  - business_profile
+not_my_job:
+  - financial_statements
+  - contracts
+  - hr
+persona: ""

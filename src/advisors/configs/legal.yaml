@@ -1,0 +1,12 @@
+id: legal
+version: "0"
+name: "Legal"
+expertise: >
+  Contratos, obligaciones, riesgo regulatorio y cumplimiento.
+can_see:
+  - business_profile
+not_my_job:
+  - financial_statements
+  - hr
+  - marketing
+persona: ""

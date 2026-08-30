@@ -47,6 +47,8 @@ import {
   type StoredStatus,
 } from "../commitments/stateMachine.js";
 import { tryHandleConversationRequest } from "./conversations.js";
+import { tryHandleEphemeralChatRequest } from "./ephemeralChat.js";
+import { tryHandleAdvisorsRequest } from "./advisors.js";
 import { tryHandleRailRequest } from "./rail.js";
 import {
   attachChatDocument,
@@ -497,6 +499,14 @@ export async function handleRequest(
       }
     }
 
+    const claimedAdvisors = await tryHandleAdvisorsRequest({
+      req,
+      res,
+      pathname,
+      sendJson,
+    });
+    if (claimedAdvisors) return;
+
     const claimedRail = await tryHandleRailRequest({
       req,
       res,
@@ -506,6 +516,16 @@ export async function handleRequest(
       sendJson,
     });
     if (claimedRail) return;
+
+    const claimedEphemeral = await tryHandleEphemeralChatRequest({
+      req,
+      res,
+      pathname,
+      ownerFrom,
+      readJson,
+      sendJson,
+    });
+    if (claimedEphemeral) return;
 
     const claimedConversation = await tryHandleConversationRequest({
       req,

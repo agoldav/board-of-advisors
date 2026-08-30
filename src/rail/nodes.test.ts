@@ -12,14 +12,16 @@ describe("rail nodes", () => {
       parentId: null,
       sortOrder: 2,
       archived: false,
-      advisorId: "finance",
+      expertType: "financiero",
+      advisorId: "financiero",
     });
     expect(parseRailMeta(raw)).toEqual({
       kind: "advisor",
       parentId: null,
       sortOrder: 2,
       archived: false,
-      advisorId: "finance",
+      expertType: "financiero",
+      advisorId: "financiero",
     });
   });
 

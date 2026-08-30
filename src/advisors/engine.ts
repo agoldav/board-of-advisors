@@ -17,7 +17,8 @@ import { withTransaction } from "../db/pool.js";
 import { createProvider, type LlmProvider } from "../llm/client.js";
 import { routeModel } from "../llm/router.js";
 import { getActivePrefix } from "../profile/service.js";
-import { getAdvisor, renderAdvisorInstructions } from "./registry.js";
+import { getAdvisor, renderAdvisorInstructions, renderCustomAdvisorInstructions } from "./registry.js";
+import { CUSTOM_EXPERT_TYPE } from "./presets.js";
 import {
   buildFirstReadFacts,
   renderFirstReadFacts,
@@ -75,6 +76,12 @@ export interface AskAdvisorArgs {
   conversationId: string;
   advisorId: string;
   question: string;
+  /** Custom advisor role text (D-041). Required when advisorId is "custom". */
+  customRole?: string;
+  /** Rail card title for custom advisors. */
+  displayTitle?: string;
+  /** When false, returns the answer without writing messages (ephemeral chat). */
+  persistMessages?: boolean;
   /** The figures the advisor is reasoning about, captured for traceability (D-035). */
   dataSnapshot: unknown;
   /** When true, persist the answer as a recommendation. Default true. */
@@ -95,10 +102,21 @@ export async function askAdvisor(
   deps: EngineDeps = {},
 ): Promise<AskAdvisorResult> {
   const provider = deps.provider ?? createProvider();
-  const advisor = getAdvisor(args.advisorId);
+  const isCustom = args.advisorId === CUSTOM_EXPERT_TYPE;
+  const advisor = isCustom ? null : getAdvisor(args.advisorId);
   const { model } = routeModel({ kind: "chat", text: args.question });
   const cachedPrefix = await requirePrefix(args.ownerId, args.profileId);
-  const advisorInstructions = renderAdvisorInstructions(advisor);
+  const advisorInstructions = isCustom
+    ? renderCustomAdvisorInstructions(
+        args.displayTitle ?? "Asesor",
+        args.customRole?.trim() ||
+          (() => {
+            throw new Error("Custom advisor needs a role description.");
+          })(),
+      )
+    : renderAdvisorInstructions(advisor!);
+  const advisorConfigVersion = isCustom ? "custom" : advisor!.version;
+  const persistedAdvisorId = isCustom ? CUSTOM_EXPERT_TYPE : advisor!.id;
 
   // D-029: persist and commit BEFORE the call.
   const operationId = await startOperation({
@@ -106,12 +124,13 @@ export async function askAdvisor(
     kind: "chat",
     model,
     inputState: {
-      advisorId: advisor.id,
-      advisorConfigVersion: advisor.version,
+      advisorId: persistedAdvisorId,
+      advisorConfigVersion,
       conversationId: args.conversationId,
       question: args.question,
       dataSnapshot: args.dataSnapshot,
       model,
+      ...(isCustom ? { customRole: args.customRole, displayTitle: args.displayTitle } : {}),
     },
   });
 
@@ -133,6 +152,13 @@ export async function askAdvisor(
   }
 
   const persisted = await withTransaction(async (client) => {
+    if (args.persistMessages === false) {
+      return {
+        userMessageId: "",
+        assistantMessageId: "",
+        recommendationId: undefined as string | undefined,
+      };
+    }
     const userMessageId = await saveMessage(client, {
       ownerId: args.ownerId,
       conversationId: args.conversationId,
@@ -144,7 +170,7 @@ export async function askAdvisor(
       conversationId: args.conversationId,
       role: "assistant",
       content: result.text,
-      advisorId: advisor.id,
+      advisorId: persistedAdvisorId,
       modelUsed: result.model,
       usage: result.usage,
     });
@@ -154,10 +180,10 @@ export async function askAdvisor(
       recommendationId = await saveRecommendation(client, {
         ownerId: args.ownerId,
         text: result.text,
-        advisorId: advisor.id,
+        advisorId: persistedAdvisorId,
         sourceMessageId: assistantMessageId,
         sourceDataSnapshot: args.dataSnapshot,
-        advisorConfigVersion: advisor.version,
+        advisorConfigVersion,
         modelUsed: result.model,
       });
     }
@@ -220,7 +246,7 @@ export async function firstReading(
   }
 
   const provider = deps.provider ?? createProvider();
-  const advisor = getAdvisor("finance");
+  const advisor = getAdvisor("financiero");
   const { model } = routeModel({ kind: "first_read" }); // -> Opus (D-021)
   const cachedPrefix = await requirePrefix(args.ownerId, args.profileId);
 

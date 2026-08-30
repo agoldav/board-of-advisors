@@ -1,0 +1,12 @@
+id: mercadeo
+version: "0"
+name: "Mercadeo"
+expertise: >
+  Posicionamiento, canales, mensaje, adquisición de clientes y retención.
+can_see:
+  - business_profile
+not_my_job:
+  - financial_statements
+  - contracts
+  - hr
+persona: ""

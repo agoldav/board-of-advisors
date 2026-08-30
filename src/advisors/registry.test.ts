@@ -1,17 +1,23 @@
 import { describe, it, expect } from "vitest";
 import { getAdvisor, listAdvisors, renderAdvisorInstructions } from "./registry.js";
+import { PRESET_EXPERT_COUNT } from "./presets.js";
 
 describe("advisor registry", () => {
-  it("loads the fully-defined finance advisor", () => {
-    const finance = getAdvisor("finance");
-    expect(finance.id).toBe("finance");
-    expect(finance.version).toBe("1");
-    expect(finance.not_my_job).toContain("contracts");
+  it("loads the fully-defined financiero advisor", () => {
+    const financiero = getAdvisor("financiero");
+    expect(financiero.id).toBe("financiero");
+    expect(financiero.version).toBe("1");
+    expect(financiero.not_my_job).toContain("contracts");
   });
 
-  it("loads name-only stubs (operations)", () => {
-    const ops = getAdvisor("operations");
-    expect(ops.id).toBe("operations");
+  it("maps legacy finance id to financiero", () => {
+    const finance = getAdvisor("finance");
+    expect(finance.id).toBe("financiero");
+  });
+
+  it("loads name-only stubs (operaciones)", () => {
+    const ops = getAdvisor("operaciones");
+    expect(ops.id).toBe("operaciones");
     expect(ops.version).toBe("0");
   });
 
@@ -20,15 +26,17 @@ describe("advisor registry", () => {
   });
 
   it("renders a compact instruction delta that states not_my_job (D-034)", () => {
-    const text = renderAdvisorInstructions(getAdvisor("finance"));
-    expect(text).toContain("Asesor Financiero");
-    expect(text).toContain("finance v1");
+    const text = renderAdvisorInstructions(getAdvisor("financiero"));
+    expect(text).toContain("Financiero");
+    expect(text).toContain("financiero v1");
     expect(text.toLowerCase()).toContain("not your job");
   });
 
-  it("registers at least finance and operations", () => {
+  it("registers all seven preset expert types", () => {
     const ids = listAdvisors().map((a) => a.id);
-    expect(ids).toContain("finance");
-    expect(ids).toContain("operations");
+    expect(ids).toContain("financiero");
+    expect(ids).toContain("operaciones");
+    expect(ids).toContain("legal");
+    expect(ids.length).toBeGreaterThanOrEqual(PRESET_EXPERT_COUNT);
   });
 });
