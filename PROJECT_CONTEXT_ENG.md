@@ -776,13 +776,51 @@ change the architecture if deferred past it. Decide before the product is sold.
 
 ---
 
+**Session 2026-08-12 — Create advisor / section + drag**
+
+**Pending item 4.** Owner-created advisors and sections in the rail, ⋮ menu, and DnD.
+
+**How (no migration / no schema `0001` or `askAdvisor` change):**
+- Rail node = conversation + `system` message `__boa_rail_v1__` (kind, parentId, sortOrder, archived, advisorId).
+- `GET/POST /api/rail`, `PATCH/DELETE /api/rail/nodes/:id` — list, create advisor/section/thread, rename, archive, move/nest, delete (children reparented).
+- First load ensures a **Financial Advisor** and hangs orphan threads under it.
+- UI: Create new advisor / Create new section; ⋮ → Rename / Archive / Delete / Create Sub; drag to reorder or nest.
+- Compromisos and Documentos stay fixed product routes, not deletable tree nodes.
+
+**Verification:** 84 tests green; typecheck + web build clean.
+
+---
+
+**Session 2026-08-29 — Rail polish (item 4): reorder, collapse, relative time**
+
+**Branch:** `feature/rail-create-advisor-section-dnd` (PR #5).
+
+**Left rail UI:**
+- One card per advisor; resizable rail (200–480 px, persisted in localStorage).
+- Collapse/expand (▼) on advisors, sections, and threads.
+- Create advisor / section / thread with instant on-screen placeholder (optimistic UI) and faster server response on create.
+- Reorder advisors: drag the ⠿ grip, orange line between cards follows the cursor, release to place; UI updates immediately (API syncs in background).
+- Relative time since last interaction on every thread and sub line (`1m`, `3h`, `6d`…); on the advisor header only when that tab is collapsed (shows the newest activity in the subtree).
+
+**Chat:**
+- Composer spans full width; Send button and footer hint no longer clipped.
+
+**Backend (no schema change):**
+- `createRailNode` optimized: no full-tree reload after each create.
+
+**Verification:** web build clean.
+
+---
+
 ### ⏳ Pending
 
 **UI build — agreed order (2026-08-10):**
-1. **Create advisor / Create section + drag to nest**, including:
-   - Active Create new advisor / Create new section controls.
-   - ⋮ menu on each advisor and section: **Rename**, **Archive**, **Delete**, **Create Sub** (new section/chat inside the advisor or section).
-   - Drag to move and nest all advisors and sections.
+1. ~~Chat threads in DB (D-039)~~ — done
+2. ~~Paragraph comments~~ — done
+3. ~~Document view 1b~~ — done
+4. ~~Create advisor / Create section + drag~~ — done 2026-08-12
+
+*(Agreed 2026-08-10 UI queue is empty.)*
 
 **Deferred to v2:**
 - Nightly digest (Batch API)
@@ -794,4 +832,4 @@ change the architecture if deferred past it. Decide before the product is sold.
 
 ---
 
-**Last Updated:** 2026-08-12 (session close: items 2–3 on main; item 4 pending)
+**Last Updated:** 2026-08-29 (rail polish: reorder, collapse, relative time, chat composer)
